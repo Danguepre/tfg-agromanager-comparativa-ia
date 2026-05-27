@@ -1,0 +1,11 @@
+Comando ejecutado:
+
+cd tfg-deepseek/frontend
+npm run build
+
+Resultado:
+
+built in 671ms
+57 modules transformed
+dist/index.html                  0.33 kB | gzip:  0.25 kB
+dist/assets/index-Byj7vGJZ.js  235.03 kB | gzip: 68.63 kB

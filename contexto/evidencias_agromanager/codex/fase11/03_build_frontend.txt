@@ -1,0 +1,8 @@
+Comando ejecutado:
+
+npm.cmd run build
+
+Resultado:
+
+Frontend build OK.
+Vite terminó con built.
