@@ -2,8 +2,8 @@
 
 ## FASE 9 — Panel admin visual
 
-**Estado del documento:** Provisional  
-**Motivo:** Codex y DeepSeek están validados. Claude Code queda pendiente por agotamiento de cuota/herramienta y se añadirá cuando pueda completarse.
+**Estado del documento:** Final  
+**Motivo:** Codex, DeepSeek y Claude Code están validados. Claude Code fue completado posteriormente tras una interrupción temporal por cuota/herramienta y una corrección del rol admin en frontend.
 
 ---
 
@@ -111,11 +111,11 @@ Requisitos:
 
 ---
 
-# Tabla comparativa provisional FASE 9
+# Tabla comparativa final FASE 9
 
-| IA | Estado | Iteraciones | Build frontend | Backend tests | Visual admin | Admin route | Admin usuarios | Admin cultivos | Admin tareas | Observaciones | Puntuación provisional |
+| IA | Estado | Iteraciones | Build frontend | Backend tests | Visual admin | Admin route | Admin usuarios | Admin cultivos | Admin tareas | Observaciones | Puntuación final |
 |---|---|---:|---|---|---|---|---|---|---|---|---:|
-| Claude Code | Pendiente | — | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Bloqueado por cuota/herramienta; se añadirá después | Pendiente |
+| Claude Code | Validado tras corrección | 2 | OK, 581ms | OK, 83 tests | OK | Sí | Sí | Sí | Sí | Bug inicial por `user.role` ausente en `localStorage`; corregido decodificando JWT | 92 |
 | Codex | Validado | 1 | OK, 151ms | OK, 50 tests | OK | Sí | Sí | Sí | Sí | Admin creado manualmente en SQLite | 91 |
 | DeepSeek | Validado | 1 | OK, 671ms | OK, 104 tests | OK | Sí | Sí | Sí | Sí | Admin creado manualmente en SQLite | 93 |
 
@@ -226,7 +226,7 @@ Resultado visual:
 
 | Limitación | Impacto | Estado |
 |---|---|---|
-| No hay seed/admin inicial | Hay que convertir admin manualmente | Pendiente FASE 10 |
+| No hay seed/admin inicial | Hay que convertir admin manualmente | Resuelto en FASE 10 |
 | Panel visual funcional pero simple | Menor riqueza visual | Aceptable |
 | Sin búsqueda/ordenación/paginación avanzada | Gestión limitada con muchos datos | Pendiente |
 | Validación visual con pocos datos | No se comprueba comportamiento con muchos usuarios/cultivos/tareas | Pendiente |
@@ -242,7 +242,7 @@ La principal observación es metodológica: al no existir seed ni creación segu
 
 ---
 
-## Puntuación provisional Codex FASE 9
+## Puntuación final Codex FASE 9
 
 ```text
 91/100
@@ -250,7 +250,7 @@ La principal observación es metodológica: al no existir seed ni creación segu
 
 ### Justificación
 
-Codex cumple la fase correctamente, pasa build y tests, y el panel admin funciona visualmente. Se penaliza ligeramente por simplicidad visual y por la ausencia de seed/admin inicial, aunque esta última es una limitación del alcance general y queda para FASE 10.
+Codex cumple la fase correctamente, pasa build y tests, y el panel admin funciona visualmente. Se penaliza ligeramente por simplicidad visual y por la ausencia de seed/admin inicial en ese momento, aunque esta limitación queda resuelta posteriormente en FASE 10.
 
 ---
 
@@ -423,7 +423,7 @@ OK
 
 | Limitación | Impacto | Estado |
 |---|---|---|
-| No hay seed/admin inicial | Requiere modificar DB manualmente | Pendiente FASE 10 |
+| No hay seed/admin inicial | Requiere modificar DB manualmente | Resuelto en FASE 10 |
 | Tablas sin paginación/búsqueda/ordenación avanzada | Gestión limitada con muchos datos | Pendiente |
 | Dashboard sin gráficos | Visualmente simple | Aceptable |
 | Validación frontend básica | Backend soporta validación principal | Aceptable |
@@ -440,7 +440,7 @@ OK
 
 ---
 
-## Puntuación provisional DeepSeek FASE 9
+## Puntuación final DeepSeek FASE 9
 
 ```text
 93/100
@@ -448,7 +448,7 @@ OK
 
 ### Justificación
 
-DeepSeek supera a Codex por mayor cobertura backend, mejor estructura del panel admin y protección admin más explícita. Se penaliza por simplicidad visual y ausencia de seed/admin inicial.
+DeepSeek supera a Codex por mayor cobertura backend, mejor estructura del panel admin y protección admin más explícita. Se penaliza por simplicidad visual y ausencia de seed/admin inicial en ese momento, aunque esta limitación queda resuelta en FASE 10.
 
 ---
 
@@ -456,36 +456,279 @@ DeepSeek supera a Codex por mayor cobertura backend, mejor estructura del panel 
 
 ## Estado
 
-**Pendiente.**
+**Validado y cerrado tras corrección.**
 
-Claude no se ha podido validar en FASE 9 por agotamiento de cuota/herramienta.
-
----
-
-## Situación actual
-
-- FASE 8 de Claude quedó validada.
-- FASE 9 está pendiente.
-- Se intentó continuar con Claude Haiku 4.5 mediante Cline, pero requiere API key de Anthropic.
-- Para mantener la comparación, Claude FASE 9 queda pausado hasta:
-  - renovación de cuota de GitHub Copilot Chat;
-  - o uso explícito de Cline/Anthropic API, dejando registrada la diferencia metodológica.
+Claude Code completó la FASE 9 implementando el panel admin visual en frontend. Inicialmente la fase parecía implementada, pero durante la validación visual se detectó un bug que impedía ver el enlace Admin y acceder al panel aunque el backend reconocía el rol correctamente.
 
 ---
 
-## Nota metodológica
+## Archivos creados
 
-Si Claude se continúa con Cline usando `anthropic/claude-haiku-4.5`, debe registrarse en la comparación como cambio de herramienta:
+Claude reportó la creación de:
+
+- `frontend/src/components/ProtectedAdminRoute.jsx`
+- `frontend/src/pages/AdminDashboard.jsx`
+- `frontend/src/pages/AdminUsers.jsx`
+- `frontend/src/pages/AdminCrops.jsx`
+- `frontend/src/pages/AdminTasks.jsx`
+- `frontend/src/pages/AdminPages.css`
+- `scripts/make_admin.py`
+- `PHASE9_IMPLEMENTATION.md`
+- `QUICKSTART_PHASE9.md`
+
+## Archivos modificados
+
+Claude reportó modificaciones en:
+
+- `frontend/src/App.jsx`
+- `frontend/src/api/api.js`
+- `frontend/src/components/Navbar.jsx`
+- `README.md`
+
+Tras la corrección del bug de rol admin también se modificaron:
+
+- `frontend/src/api/api.js`
+- `frontend/src/components/Login.jsx`
+- `frontend/src/components/Register.jsx`
+
+---
+
+## Rutas frontend admin añadidas
+
+| Ruta | Descripción |
+|---|---|
+| `/admin` | Redirección o acceso al área admin |
+| `/admin/dashboard` | Dashboard admin con resumen global |
+| `/admin/users` | Gestión de usuarios |
+| `/admin/crops` | Gestión de cultivos |
+| `/admin/tasks` | Gestión de tareas |
+
+---
+
+## Endpoints admin consumidos
+
+Claude reportó el consumo de 13 endpoints del backend de FASE 7:
+
+- `GET /admin/summary`
+- `GET /admin/users?skip=0&limit=50`
+- `GET /admin/users/{id}`
+- `PATCH /admin/users/{id}`
+- `DELETE /admin/users/{id}`
+- `GET /admin/crops?skip=0&limit=50`
+- `GET /admin/crops/{id}`
+- `PATCH /admin/crops/{id}`
+- `DELETE /admin/crops/{id}`
+- `GET /admin/tasks?skip=0&limit=50`
+- `GET /admin/tasks/{id}`
+- `PATCH /admin/tasks/{id}`
+- `DELETE /admin/tasks/{id}`
+
+---
+
+## Decisiones técnicas reportadas
+
+- Protección en dos capas:
+  - frontend mediante `ProtectedAdminRoute`;
+  - backend mediante dependencias de admin en endpoints `/admin`.
+- Edición inline en tablas.
+- API client basado en Fetch API.
+- Normalización de respuestas paginadas.
+- Estados `loading`, `error` y vacío en cada componente.
+- Navbar con enlace Admin condicional por rol.
+
+---
+
+## Validación técnica inicial
+
+### Build frontend inicial
 
 ```text
-Claude FASE 9 continuado mediante Cline con anthropic/claude-haiku-4.5 tras agotarse la cuota mensual de GitHub Copilot Chat.
+vite v5.4.21 building for production...
+✓ 58 modules transformed.
+dist/index.html                   0.47 kB
+dist/assets/index-D5y9pt0e.css   12.92 kB
+dist/assets/index-DqzCHHQ1.js   197.86 kB
+✓ built in 573ms
 ```
 
-Esto mantiene el mismo modelo/familia aproximada, pero cambia la herramienta agente y puede afectar la comparación.
+### Tests backend iniciales
+
+```text
+Ran 83 tests in 54.402s
+
+OK
+```
 
 ---
 
-# Comparación provisional FASE 9
+## Incidencia detectada — rol admin no disponible en frontend
+
+### Síntoma
+
+El backend reconocía correctamente al usuario como admin, pero el frontend no mostraba el enlace Admin y `/admin/dashboard` mostraba “Acceso denegado”.
+
+### Causa
+
+El JWT contenía el rol:
+
+```json
+{
+  "role": "admin"
+}
+```
+
+pero el backend devolvía solo:
+
+```json
+{
+  "access_token": "...",
+  "token_type": "...",
+  "expires_in": "..."
+}
+```
+
+El frontend buscaba `response.user`, que no existía, y terminaba guardando un usuario simplificado:
+
+```json
+{
+  "email": "admin@test.com"
+}
+```
+
+Por tanto:
+
+```text
+user.role === undefined
+```
+
+y `ProtectedAdminRoute` evaluaba:
+
+```text
+undefined !== "admin"
+```
+
+mostrando acceso denegado.
+
+---
+
+## Corrección aplicada
+
+Claude añadió un helper `parseJwt()` en `frontend/src/api/api.js`:
+
+```javascript
+export function parseJwt(token) {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+    const decoded = JSON.parse(atob(parts[1]))
+    return decoded
+  } catch (error) {
+    console.error('Error parsing JWT:', error)
+    return null
+  }
+}
+```
+
+Después modificó `Login.jsx` y `Register.jsx` para decodificar el token y construir un objeto de usuario con:
+
+- `id`;
+- `email`;
+- `role`;
+- `name`.
+
+Ejemplo de usuario final guardado:
+
+```json
+{
+  "id": 1,
+  "email": "admin@test.com",
+  "role": "admin",
+  "name": "admin"
+}
+```
+
+---
+
+## Validación técnica tras corrección
+
+### Build frontend
+
+```text
+vite v5.4.21 building for production...
+✓ 58 modules transformed.
+dist/index.html                   0.47 kB │ gzip:  0.31 kB
+dist/assets/index-AXNBHVE3.js   198.27 kB │ gzip: 60.35 kB
+dist/assets/index-D5y9pt0e.css   12.92 kB │ gzip:  2.90 kB
+✓ built in 581ms
+```
+
+### Tests backend
+
+```text
+Ran 83 tests in 51.210s
+
+OK
+```
+
+---
+
+## Validación visual final
+
+### Admin
+
+- Login como admin: OK.
+- `localStorage` contiene usuario con `role: "admin"`.
+- Navbar muestra enlace “Admin”.
+- `/admin/dashboard` carga correctamente.
+- `/admin/users` accesible.
+- `/admin/crops` accesible.
+- `/admin/tasks` accesible.
+
+### Usuario normal
+
+- Usuario normal no ve enlace Admin.
+- Usuario normal no accede a rutas admin.
+- Resto del frontend de usuario sigue funcionando.
+
+---
+
+## Fortalezas Claude FASE 9
+
+- Panel admin visual completo.
+- Buena documentación de implementación.
+- Protección por rol en frontend.
+- Consumo amplio de endpoints admin.
+- Corrección razonada del bug de `user.role`.
+- Validación visual final correcta.
+- Sin regresiones backend.
+
+---
+
+## Limitaciones Claude FASE 9
+
+| Limitación | Impacto | Estado |
+|---|---|---|
+| Bug inicial con rol admin en frontend | Bloqueaba acceso admin visual | Corregido |
+| Rol derivado de `localStorage` en frontend | Riesgo si se manipula cliente | Mitigado por backend |
+| Paginación frontend limitada | Gestión básica | Pendiente |
+| Sin toasts ni feedback avanzado | UX simple | Aceptable |
+| Sin seed inicial en esta fase | Admin se prepara con script/manual | Resuelto en FASE 10 |
+
+---
+
+## Puntuación final Claude FASE 9
+
+```text
+92/100
+```
+
+### Justificación
+
+Claude entrega un panel admin completo y documentado, con consumo amplio de endpoints y buena corrección posterior del problema de rol. Se penaliza por haber necesitado una segunda iteración para solucionar un bug que bloqueaba el acceso visual al panel admin.
+
+---
+
+# Comparación final FASE 9
 
 ## Mejor cobertura backend
 
@@ -493,7 +736,7 @@ Esto mantiene el mismo modelo/familia aproximada, pero cambia la herramienta age
 
 Motivo:
 
-- 104 tests frente a 50 de Codex.
+- 104 tests frente a 83 de Claude y 50 de Codex.
 - Mantiene cobertura amplia de fases anteriores.
 
 ## Mejor velocidad de build
@@ -502,57 +745,63 @@ Motivo:
 
 Motivo:
 
-- Build en 151ms frente a 671ms de DeepSeek.
+- Build en 151ms frente a 581ms de Claude y 671ms de DeepSeek.
 
 ## Mejor estructura admin
 
-**DeepSeek**
+**Empate DeepSeek / Claude Code**
 
 Motivo:
 
-- Componentes admin separados.
-- `AdminRoute`.
-- `isAdmin`.
-- Manejo específico de 403.
-- Normalización ampliada.
+- DeepSeek divide bien el panel admin en componentes específicos y usa `AdminRoute`.
+- Claude implementa rutas admin protegidas, componentes específicos y consume 13 endpoints admin.
 
-## Mejor estabilidad visual
+## Mejor corrección posterior
 
-**Empate Codex / DeepSeek**
+**Claude Code**
 
 Motivo:
 
-- Ambos cargan correctamente dashboard, usuarios, cultivos y tareas admin.
-- Ambos requieren admin manual por SQLite.
+- Identificó y corrigió la causa real del bug de rol admin.
+- La solución decodifica JWT y conserva coherencia entre token, usuario local y rutas protegidas.
 
-## Mejor resultado provisional
+## Mejor estabilidad en primera pasada
 
-**DeepSeek**
+**Codex / DeepSeek**
 
 Motivo:
 
-- Mayor cobertura.
-- Mejor estructura.
-- Validación visual completa.
-- Sin regresiones.
+- No requirieron una segunda iteración para hacer visible el panel admin.
+- Claude necesitó corrección para que el admin pudiera acceder visualmente.
+
+## Mejor resultado final
+
+**DeepSeek por margen pequeño**
+
+Motivo:
+
+- Mayor cobertura backend.
+- Buena estructura admin.
+- Menos iteraciones que Claude.
+- Codex fue muy estable, pero más simple.
 
 ---
 
-# Resultado provisional
+# Resultado final
 
-| Posición provisional | IA | Puntuación | Motivo |
+| Posición | IA | Puntuación | Motivo |
 |---:|---|---:|---|
-| 1 | DeepSeek | 93/100 | Mayor cobertura y mejor estructura admin |
-| 2 | Codex | 91/100 | Funcional y estable, build muy rápido |
-| — | Claude Code | Pendiente | Bloqueado por cuota/herramienta |
+| 1 | DeepSeek | 93/100 | Mayor cobertura y buena estructura admin |
+| 2 | Claude Code | 92/100 | Panel completo y gran corrección del bug de rol |
+| 3 | Codex | 91/100 | Funcional, estable y rápido, aunque más simple |
 
 ---
 
-# Estado acumulado provisional tras FASE 9
+# Estado acumulado tras FASE 9
 
 | IA | Piloto 0-3 | FASE 4 | FASE 5 | FASE 6 | FASE 7 | FASE 8 | FASE 9 | Estado acumulado |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
-| Claude Code | 75 | 90 | 88 | 91 | 92 | 91 | Pendiente | Funcional hasta FASE 8; FASE 9 pendiente |
+| Claude Code | 75 | 90 | 88 | 91 | 92 | 91 | 92 | Funcional y completo, con corrección relevante en admin |
 | Codex | 77 | 86 | 90 | 90 | 91 | 90 | 91 | Funcional y estable, aunque más simple |
 | DeepSeek | 87 | 94 | 96 | 96 | 97 | 92 | 93 | Mejor resultado acumulado provisional |
 
@@ -562,9 +811,9 @@ Motivo:
 
 ## Falta de seed/admin inicial
 
-Tanto Codex como DeepSeek necesitaron un admin creado o activado manualmente en SQLite para validar el panel admin.
+Codex y DeepSeek necesitaron un admin creado o activado manualmente en SQLite para validar el panel admin. Claude incluyó un script auxiliar `make_admin.py`.
 
-Esto confirma que la siguiente fase debería resolver:
+Esto confirma que la siguiente fase debía resolver:
 
 - creación segura de usuario admin inicial;
 - datos de ejemplo;
@@ -574,7 +823,7 @@ Esto confirma que la siguiente fase debería resolver:
 
 ## Validación visual con pocos datos
 
-Los paneles se han validado principalmente con datos vacíos o mínimos.
+Los paneles se validaron principalmente con datos vacíos o mínimos.
 
 Esto no invalida FASE 9, pero limita la comprobación de:
 
@@ -591,50 +840,12 @@ Sigue pendiente resolver el problema de bases SQLite antiguas cuando cambian los
 
 ---
 
-# Próximo paso recomendado
+# Conclusión FASE 9
 
-La siguiente fase debería ser:
+FASE 9 queda cerrada con las tres implementaciones validadas.
 
-```text
-FASE 10 — Seed/admin inicial y datos de ejemplo
-```
+- **DeepSeek** obtiene la mejor puntuación por cobertura backend y buena estructura admin.
+- **Claude Code** queda muy cerca tras corregir el bug del rol admin y finalizar con un panel completo.
+- **Codex** ofrece una solución estable, rápida y funcional, aunque más sencilla.
 
-## Objetivo recomendado FASE 10
-
-Implementar mecanismos controlados para preparar el entorno de prueba y demostración:
-
-- Crear usuario admin inicial de forma segura.
-- Crear usuario normal de ejemplo.
-- Crear cultivos públicos de ejemplo.
-- Crear cultivos personales.
-- Crear tareas de ejemplo.
-- Crear calendario agrícola de ejemplo.
-- Crear datos de riego.
-- Crear requisitos ambientales.
-- Documentar cómo ejecutar el seed.
-- Evitar secretos reales.
-- Mantener tests backend pasando.
-- Mantener build frontend pasando.
-
-## Motivo
-
-FASE 10 resolvería la principal limitación detectada en FASE 8 y FASE 9: la app funciona, pero no tiene datos iniciales suficientes para una demostración completa sin manipular SQLite manualmente.
-
----
-
-# Estado del documento
-
-Este documento es provisional porque falta añadir Claude Code FASE 9.
-
-Cuando Claude esté disponible:
-
-1. Ejecutar prompt FASE 9 en `tfg-claude/`.
-2. Validar:
-   - `npm run build`;
-   - tests backend;
-   - usuario normal;
-   - usuario admin;
-   - dashboard admin;
-   - usuarios/cultivos/tareas admin.
-3. Añadir resultados al documento.
-4. Convertir este documento de provisional a final.
+La fase confirma que el panel admin visual es una funcionalidad crítica para comprobar la coherencia entre backend, frontend, autenticación, roles y estado local del navegador.

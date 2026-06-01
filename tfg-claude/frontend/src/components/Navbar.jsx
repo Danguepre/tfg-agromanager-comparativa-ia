@@ -52,6 +52,14 @@ export function Navbar() {
               >
                 Tareas
               </Link>
+              {user.role === 'admin' && (
+                <Link
+                  to="/admin/dashboard"
+                  className={`nav-link ${isActive('/admin/dashboard') ? 'active' : ''}`}
+                >
+                  🔧 Admin
+                </Link>
+              )}
             </div>
 
             <div className="navbar-user">

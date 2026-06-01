@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { Layout } from './components/Layout'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { ProtectedAdminRoute } from './components/ProtectedAdminRoute'
 import { Login } from './components/Login'
 import { Register } from './components/Register'
 import { Home } from './pages/Home'
@@ -11,6 +12,10 @@ import { Crops } from './pages/Crops'
 import { CropDetail } from './pages/CropDetail'
 import { Calendar } from './pages/Calendar'
 import { Tasks } from './pages/Tasks'
+import { AdminDashboard } from './pages/AdminDashboard'
+import { AdminUsers } from './pages/AdminUsers'
+import { AdminCrops } from './pages/AdminCrops'
+import { AdminTasks } from './pages/AdminTasks'
 
 /**
  * Componente principal de la aplicación con enrutamiento.
@@ -32,7 +37,7 @@ function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
 
-        {/* Rutas protegidas */}
+        {/* Rutas protegidas usuario */}
         <Route
           path="/dashboard"
           element={
@@ -79,6 +84,48 @@ function App() {
             <ProtectedRoute>
               <Tasks />
             </ProtectedRoute>
+          }
+        />
+
+        {/* Rutas protegidas admin */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedAdminRoute>
+              <AdminDashboard />
+            </ProtectedAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedAdminRoute>
+              <AdminUsers />
+            </ProtectedAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/crops"
+          element={
+            <ProtectedAdminRoute>
+              <AdminCrops />
+            </ProtectedAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/tasks"
+          element={
+            <ProtectedAdminRoute>
+              <AdminTasks />
+            </ProtectedAdminRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedAdminRoute>
+              <AdminDashboard />
+            </ProtectedAdminRoute>
           }
         />
       </Route>

@@ -2,8 +2,8 @@
 
 ## FASE 10 — Seed/admin inicial y datos de ejemplo
 
-**Estado del documento:** Provisional  
-**Motivo:** Codex y DeepSeek están validados. Claude Code queda pendiente por agotamiento de cuota/herramienta y se añadirá cuando pueda completarse.
+**Estado del documento:** Final  
+**Motivo:** Codex, DeepSeek y Claude Code están validados. Claude Code fue completado posteriormente tras una interrupción temporal por cuota/herramienta y una corrección para alinear sus criterios con Codex y DeepSeek.
 
 ---
 
@@ -62,11 +62,11 @@ El seed debe permitir probar:
 
 ---
 
-# Tabla comparativa provisional FASE 10
+# Tabla comparativa final FASE 10
 
-| IA | Estado | Seed | Tests | Build | Visual | Incidencias | Puntuación provisional |
+| IA | Estado | Seed | Tests | Build | Visual | Incidencias | Puntuación final |
 |---|---|---|---|---|---|---|---:|
-| Claude Code | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Bloqueado por cuota/herramienta | Pendiente |
+| Claude Code | Validado y cerrado tras ajuste | OK, idempotente | OK, 106 tests | OK, 569ms | OK | Primera versión funcional pero incompleta; corregida con tests y 2 cultivos personales | 94 |
 | Codex | Validado y cerrado | OK, idempotente | OK, 52 tests con `discover` | OK, 90ms | OK | Ninguna bloqueante | 94 |
 | DeepSeek | Validado y cerrado tras corrección | OK, idempotente | OK, 117 tests ejecución conjunta explícita | OK, 582ms | OK | Contaminación de `get_db` corregida | 95 |
 
@@ -258,7 +258,7 @@ No se detectaron incidencias bloqueantes en FASE 10.
 
 ---
 
-## Puntuación provisional Codex FASE 10
+## Puntuación final Codex FASE 10
 
 ```text
 94/100
@@ -488,7 +488,7 @@ El dashboard de usuario también muestra:
 
 ---
 
-## Puntuación provisional DeepSeek FASE 10
+## Puntuación final DeepSeek FASE 10
 
 ```text
 95/100
@@ -504,37 +504,201 @@ DeepSeek obtiene la puntuación más alta por cobertura, amplitud del seed y riq
 
 ## Estado
 
-**Pendiente.**
+**Validado y cerrado tras ajuste.**
 
-Claude Code no se ha podido validar en FASE 10 por agotamiento de cuota/herramienta.
-
----
-
-## Situación actual
-
-- Claude quedó validado hasta FASE 8.
-- Claude FASE 9 está pendiente.
-- Claude FASE 10 también queda pendiente.
-- Se retomará cuando vuelva la cuota o se decida usar una herramienta alternativa.
+Claude Code implementó el seed demo de FASE 10. La primera versión era funcional, pero no quedaba completamente alineada con los criterios usados en Codex y DeepSeek. Tras solicitar una corrección, Claude añadió tests específicos de seed, ajustó los datos demo y dejó la fase validada con 106 tests totales.
 
 ---
 
-## Nota metodológica
+## Archivos creados
 
-Si se continúa Claude mediante Cline/API externa, debe registrarse como cambio de herramienta en la comparación.
+- `tests/test_seed_demo.py`
+- `SEED_DEMO.md`
+- `ENTREGA_FASE10.md`
+- `FASE10_CIERRE_DEFINITIVO.md`
+
+## Archivos modificados
+
+- `scripts/seed_demo.py`
+- `README.md`
 
 ---
 
-# Comparación provisional FASE 10
+## Comando de seed
+
+```bash
+cd C:\Users\danie\Desktop\tfg\tfg-claude
+python scripts\seed_demo.py
+```
+
+---
+
+## Credenciales demo
+
+| Rol | Email | Contraseña |
+|---|---|---|
+| Admin | `admin@test.com` | `admin123` |
+| Usuario normal | `user@test.com` | `user123` |
+
+---
+
+## Datos demo finales
+
+| Tipo | Cantidad | Detalles |
+|---|---:|---|
+| Usuarios | 2 | admin y user |
+| Cultivos públicos | 5 | Tomate, Lechuga, Zanahoria, Pimiento, Fresa |
+| Cultivos personales | 2 | Mi Tomate, Mi Lechuga |
+| Cultivos totales | 7 | 5 públicos + 2 personales |
+| Calendarios | 3 | calendarios demo |
+| Tareas | 4 | combinación de pendientes y completadas |
+| Riego | según modelos existentes | datos asociados a cultivos |
+| Requisitos ambientales | según modelos existentes | datos asociados a cultivos |
+
+---
+
+## Ajuste solicitado
+
+La primera versión de FASE 10 funcionaba, pero presentaba tres diferencias respecto a los criterios comparativos:
+
+1. No incluía tests específicos de seed.
+2. Solo creaba un cultivo personal.
+3. Usaba `Pepino` en lugar de `Pimiento`.
+
+Tras la corrección:
+
+- se añadió `tests/test_seed_demo.py`;
+- se añadieron 17 tests específicos;
+- se ajustaron los 5 cultivos públicos;
+- se añadieron 2 cultivos personales;
+- se validó la idempotencia del seed.
+
+---
+
+## Tests añadidos
+
+Claude añadió 17 tests específicos de seed que validan:
+
+- creación de admin;
+- creación de usuario normal;
+- contraseñas hasheadas;
+- login admin;
+- login user;
+- creación de 5 cultivos públicos;
+- creación de 2 cultivos personales;
+- creación de calendarios;
+- tareas pendientes y completadas;
+- idempotencia;
+- ausencia de duplicados al ejecutar el seed varias veces.
+
+---
+
+## Tests backend
+
+Comando ejecutado:
+
+```bash
+cd C:\Users\danie\Desktop\tfg\tfg-claude
+python -m unittest discover -s tests -p "test*.py"
+```
+
+Resultado:
+
+```text
+Ran 106 tests in 60.570s
+
+OK
+```
+
+---
+
+## Build frontend
+
+Comando ejecutado:
+
+```bash
+cd C:\Users\danie\Desktop\tfg\tfg-claude\frontend
+npm run build
+```
+
+Resultado:
+
+```text
+vite v5.4.21 building for production...
+✓ 58 modules transformed.
+✓ built in 569ms
+```
+
+---
+
+## Validación visual
+
+### Usuario normal
+
+- Login con `user@test.com / user123`.
+- Dashboard con datos.
+- Mis cultivos con `Mi Tomate` y `Mi Lechuga`.
+- Catálogo con 5 cultivos públicos.
+- Calendario con eventos o calendarios demo.
+- Tareas con estados pendientes y completadas.
+- No aparece enlace Admin.
+
+### Admin
+
+- Login con `admin@test.com / admin123`.
+- Enlace Admin visible.
+- `/admin/dashboard` muestra datos globales.
+- `/admin/users` muestra usuarios.
+- `/admin/crops` muestra cultivos.
+- `/admin/tasks` muestra tareas.
+
+---
+
+## Fortalezas Claude FASE 10
+
+- 17 tests específicos de seed.
+- Seed demo ajustado a los criterios comparativos.
+- 106 tests totales OK.
+- Build frontend correcto.
+- Documentación específica de entrega y cierre.
+- Idempotencia validada.
+- Corrige las diferencias detectadas en la primera versión.
+
+---
+
+## Limitaciones Claude FASE 10
+
+| Limitación | Impacto | Estado |
+|---|---|---|
+| Primera versión no estaba alineada con criterios comunes | Comparación incompleta | Corregida |
+| No implementa migraciones/Alembic | Igual que el resto de herramientas | Pendiente |
+| No implementa E2E | Validación visual manual | Pendiente |
+| Documentación adicional extensa | Puede generar ruido si no se organiza | Aceptable |
+
+---
+
+## Puntuación final Claude FASE 10
+
+```text
+94/100
+```
+
+### Justificación
+
+Claude alcanza una solución final sólida, con tests específicos, seed idempotente y build correcto. Se penaliza ligeramente porque la primera versión requirió una corrección para alinearse con los criterios de comparación.
+
+---
+
+# Comparación final FASE 10
 
 ## Mejor integración con comando estándar
 
-**Codex**
+**Codex / Claude Code**
 
 Motivo:
 
-- `python -m unittest discover -s tests -p "test*.py" -v` pasa con 52 tests.
-- El seed queda integrado en la suite habitual.
+- Ambos validan la suite final con `unittest discover`.
+- DeepSeek queda validado mediante ejecución conjunta explícita.
 
 ## Mayor cobertura de tests
 
@@ -543,7 +707,8 @@ Motivo:
 Motivo:
 
 - 117 tests en ejecución conjunta explícita.
-- 13 tests específicos del seed.
+- Claude queda cerca con 106 tests.
+- Codex mantiene 52 tests.
 
 ## Mejor build
 
@@ -551,19 +716,20 @@ Motivo:
 
 Motivo:
 
-- 90ms frente a 582ms de DeepSeek.
+- 90ms frente a 569ms de Claude y 582ms de DeepSeek.
 
 ## Mejor seed funcional
 
-**Empate con ligera ventaja DeepSeek**
+**Empate DeepSeek / Claude Code / Codex**
 
 Motivo:
 
-- Ambos crean datos suficientes.
-- DeepSeek añade más comprobaciones específicas.
-- Codex queda mejor integrado con `discover`.
+- Las tres implementaciones crean admin, usuario normal, cultivos, tareas y datos demo.
+- DeepSeek destaca por cobertura.
+- Claude destaca por tests específicos tras corrección.
+- Codex destaca por integración y estabilidad.
 
-## Mejor resultado provisional
+## Mejor resultado final
 
 **DeepSeek por margen pequeño**
 
@@ -571,25 +737,25 @@ Motivo:
 
 - Mayor cobertura y validación más profunda.
 - La incidencia inicial fue grave, pero quedó corregida.
-- Codex gana en integración y rapidez, pero tiene menos pruebas específicas.
+- Codex y Claude quedan muy cerca por estabilidad e integración.
 
 ---
 
-# Resultado provisional
+# Resultado final
 
-| Posición provisional | IA | Puntuación | Motivo |
+| Posición | IA | Puntuación | Motivo |
 |---:|---|---:|---|
 | 1 | DeepSeek | 95/100 | Mayor cobertura y seed más validado |
 | 2 | Codex | 94/100 | Muy estable, rápido e integrado |
-| — | Claude Code | Pendiente | Bloqueado por cuota/herramienta |
+| 2 | Claude Code | 94/100 | Seed completo tras ajuste y 106 tests OK |
 
 ---
 
-# Estado acumulado provisional tras FASE 10
+# Estado acumulado tras FASE 10
 
 | IA | Piloto 0-3 | FASE 4 | FASE 5 | FASE 6 | FASE 7 | FASE 8 | FASE 9 | FASE 10 | Estado acumulado |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| Claude Code | 75 | 90 | 88 | 91 | 92 | 91 | Pendiente | Pendiente | Funcional hasta FASE 8; FASE 9 y 10 pendientes |
+| Claude Code | 75 | 90 | 88 | 91 | 92 | 91 | 92 | 94 | Funcional y completo tras correcciones |
 | Codex | 77 | 86 | 90 | 90 | 91 | 90 | 91 | 94 | Funcional, estable y bien integrado |
 | DeepSeek | 87 | 94 | 96 | 96 | 97 | 92 | 93 | 95 | Mejor resultado acumulado provisional |
 
@@ -609,13 +775,17 @@ DeepSeek sufrió una incidencia importante de contaminación de `app.dependency_
 
 Esta incidencia es relevante para el TFG porque muestra una diferencia real entre generar código que funciona de forma aislada y generar código que mantiene una suite completa ejecutable.
 
-## 3. Falta de migraciones
+## 3. Alineación de criterios de seed
 
-Ni Codex ni DeepSeek implementan Alembic o migraciones reales.
+Claude mostró una incidencia metodológica distinta: la primera versión era funcional, pero no cumplía exactamente los criterios comunes de comparación. Esto obligó a solicitar una corrección para añadir tests específicos, dos cultivos personales y los cultivos públicos esperados.
+
+## 4. Falta de migraciones
+
+Ninguna herramienta implementa Alembic o migraciones reales.
 
 Esto no era requisito de FASE 10, pero queda como limitación técnica para un despliegue más profesional.
 
-## 4. Falta de tests E2E
+## 5. Falta de tests E2E
 
 No hay tests automáticos de navegador.
 
@@ -623,11 +793,11 @@ La validación visual se ha realizado manualmente.
 
 ---
 
-# Conclusión provisional FASE 10
+# Conclusión FASE 10
 
-FASE 10 cierra la parte funcional principal del caso práctico para Codex y DeepSeek.
+FASE 10 cierra la parte funcional principal del caso práctico en las tres implementaciones.
 
-Ambos proyectos ya cuentan con:
+Los tres proyectos ya cuentan con:
 
 - backend funcional;
 - frontend usuario;
@@ -643,49 +813,8 @@ Ambos proyectos ya cuentan con:
 - tests backend;
 - build frontend.
 
-La diferencia principal entre ambos es:
+La diferencia principal entre herramientas es:
 
 - **Codex** entrega una solución más compacta, rápida e integrada con el comando estándar.
 - **DeepSeek** entrega una solución más amplia y mejor cubierta por tests, pero necesitó una corrección importante de aislamiento.
-
----
-
-# Próximo paso recomendado
-
-La siguiente fase no debería añadir grandes funcionalidades nuevas, sino cerrar técnicamente el proyecto:
-
-```text
-FASE 11 — Cierre técnico, limpieza y documentación final
-```
-
-## Objetivo recomendado FASE 11
-
-- README final.
-- `.env.example`.
-- comandos claros de ejecución.
-- comandos claros de tests.
-- comandos claros de seed.
-- guía de demo.
-- capturas recomendadas.
-- limitaciones conocidas.
-- riesgos pendientes.
-- limpiar archivos temporales.
-- documentar diferencias Codex/DeepSeek.
-- preparar material para la memoria del TFG.
-
----
-
-# Estado del documento
-
-Este documento es provisional porque falta añadir Claude Code FASE 9 y FASE 10.
-
-Cuando Claude esté disponible:
-
-1. Ejecutar FASE 9.
-2. Ejecutar FASE 10.
-3. Validar build.
-4. Validar tests.
-5. Validar seed.
-6. Validar visualmente.
-7. Añadir resultados al documento.
-8. Convertir el documento de provisional a final.
+- **Claude Code** entrega una solución sólida tras ajuste, con buena documentación y 106 tests totales OK.

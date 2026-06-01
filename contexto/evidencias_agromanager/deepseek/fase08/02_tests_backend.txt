@@ -1,0 +1,16 @@
+FASE 8 — Tests backend — DeepSeek
+
+Comando ejecutado:
+
+```bash
+cd C:\Users\danie\Desktop\tfg\tfg-deepseek
+python -m unittest discover -s tests -p "test*.py" -v
+```
+
+Resultado:
+
+```text
+Ran 104 tests in 71.954s
+
+OK
+```

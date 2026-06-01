@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { authLogin } from '../api/api'
+import { authLogin, parseJwt } from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import './Auth.css'
 
@@ -19,9 +19,23 @@ export function Login() {
 
     try {
       const response = await authLogin(email, password)
-      // response debe tener: { access_token, user: { id, email, name, ... } }
-      const user = response.user || { email, id: response.user_id }
-      login(user, response.access_token)
+      const token = response.access_token
+
+      // Decodificar JWT para extraer user_id y role
+      const decoded = parseJwt(token)
+      if (!decoded) {
+        throw new Error('Error decodificando token JWT')
+      }
+
+      // Construir usuario con datos del JWT + email del formulario
+      const user = {
+        id: decoded.user_id,
+        email: email,
+        role: decoded.role,
+        name: email.split('@')[0], // Usar parte del email como nombre
+      }
+
+      login(user, token)
       navigate('/dashboard')
     } catch (err) {
       setError(err.data?.detail || err.message || 'Error en login')

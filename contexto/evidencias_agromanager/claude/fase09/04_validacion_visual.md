@@ -1,25 +1,10 @@
-# Validación visual — Claude FASE09
+# Validación visual — Claude FASE 9
 
-## Checklist usuario normal
-
-- [ ] Login usuario normal
-- [ ] Dashboard usuario
-- [ ] Mis cultivos
-- [ ] Catálogo
-- [ ] Calendario
-- [ ] Tareas
-- [ ] Logout
-
-## Checklist admin
-
-- [ ] Login admin
-- [ ] Enlace admin visible
-- [ ] Dashboard admin
-- [ ] Admin usuarios
-- [ ] Admin cultivos
-- [ ] Admin tareas
-- [ ] Logout
-
-## Observaciones
-
--
+- [x] Login admin.
+- [x] Navbar muestra enlace Admin.
+- [x] `/admin/dashboard` carga correctamente.
+- [x] `/admin/users` accesible.
+- [x] `/admin/crops` accesible.
+- [x] `/admin/tasks` accesible.
+- [x] Usuario normal no ve Admin.
+- [x] Usuario normal recibe acceso denegado en rutas admin.

@@ -8,6 +8,33 @@ import { normalizeListResponse } from './normalizers'
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 /**
+ * Decodifica un JWT sin dependencias externas.
+ * Extrae el payload (segunda parte) y lo parsea.
+ * Retorna null si hay error.
+ */
+export function parseJwt(token) {
+  try {
+    if (!token || typeof token !== 'string') {
+      return null
+    }
+
+    const parts = token.split('.')
+    if (parts.length !== 3) {
+      console.error('Invalid JWT format')
+      return null
+    }
+
+    // Decodificar payload (segunda parte)
+    const payload = parts[1]
+    const decoded = JSON.parse(atob(payload))
+    return decoded
+  } catch (error) {
+    console.error('Error parsing JWT:', error)
+    return null
+  }
+}
+
+/**
  * Realiza una petición HTTP.
  */
 async function apiCall(endpoint, options = {}) {
@@ -335,4 +362,115 @@ export function updateTask(taskId, data, token) {
  */
 export function deleteTask(taskId, token) {
   return apiDelete(`/tasks/${taskId}`, { token })
+}
+
+// ============ ADMIN ENDPOINTS ============
+
+/**
+ * Obtiene resumen del panel admin.
+ */
+export function getAdminSummary(token) {
+  return apiGet('/admin/summary', { token })
+}
+
+/**
+ * Obtiene lista de usuarios (admin).
+ */
+export async function getAdminUsers(token, skip = 0, limit = 50) {
+  try {
+    const response = await apiGet(`/admin/users?skip=${skip}&limit=${limit}`, { token })
+    return normalizeListResponse(response)
+  } catch (err) {
+    console.error('getAdminUsers error:', err)
+    throw err
+  }
+}
+
+/**
+ * Obtiene detalles de un usuario (admin).
+ */
+export function getAdminUser(userId, token) {
+  return apiGet(`/admin/users/${userId}`, { token })
+}
+
+/**
+ * Actualiza un usuario (admin).
+ */
+export function updateAdminUser(userId, data, token) {
+  return apiPatch(`/admin/users/${userId}`, data, { token })
+}
+
+/**
+ * Elimina un usuario (admin).
+ */
+export function deleteAdminUser(userId, token) {
+  return apiDelete(`/admin/users/${userId}`, { token })
+}
+
+/**
+ * Obtiene lista de cultivos (admin).
+ */
+export async function getAdminCrops(token, skip = 0, limit = 50) {
+  try {
+    const response = await apiGet(`/admin/crops?skip=${skip}&limit=${limit}`, { token })
+    return normalizeListResponse(response)
+  } catch (err) {
+    console.error('getAdminCrops error:', err)
+    throw err
+  }
+}
+
+/**
+ * Obtiene detalles de un cultivo (admin).
+ */
+export function getAdminCrop(cropId, token) {
+  return apiGet(`/admin/crops/${cropId}`, { token })
+}
+
+/**
+ * Actualiza un cultivo (admin).
+ */
+export function updateAdminCrop(cropId, data, token) {
+  return apiPatch(`/admin/crops/${cropId}`, data, { token })
+}
+
+/**
+ * Elimina un cultivo (admin).
+ */
+export function deleteAdminCrop(cropId, token) {
+  return apiDelete(`/admin/crops/${cropId}`, { token })
+}
+
+/**
+ * Obtiene lista de tareas (admin).
+ */
+export async function getAdminTasks(token, skip = 0, limit = 50) {
+  try {
+    const response = await apiGet(`/admin/tasks?skip=${skip}&limit=${limit}`, { token })
+    return normalizeListResponse(response)
+  } catch (err) {
+    console.error('getAdminTasks error:', err)
+    throw err
+  }
+}
+
+/**
+ * Obtiene detalles de una tarea (admin).
+ */
+export function getAdminTask(taskId, token) {
+  return apiGet(`/admin/tasks/${taskId}`, { token })
+}
+
+/**
+ * Actualiza una tarea (admin).
+ */
+export function updateAdminTask(taskId, data, token) {
+  return apiPatch(`/admin/tasks/${taskId}`, data, { token })
+}
+
+/**
+ * Elimina una tarea (admin).
+ */
+export function deleteAdminTask(taskId, token) {
+  return apiDelete(`/admin/tasks/${taskId}`, { token })
 }

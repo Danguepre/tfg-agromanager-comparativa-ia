@@ -1,8 +1,4 @@
-Comando ejecutado:
-
 python -m unittest discover -s tests -p "test*.py" -v
-
-Resultado:
 
 Ran 104 tests in 73.391s
 

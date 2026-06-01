@@ -2,8 +2,8 @@
 
 ## FASE 11 — Cierre técnico, limpieza y documentación final
 
-**Estado del documento:** Provisional  
-**Motivo:** Codex y DeepSeek están validados y cerrados. Claude Code queda pendiente por agotamiento de cuota/herramienta y se añadirá cuando pueda completarse.
+**Estado del documento:** Final  
+**Motivo:** Codex, DeepSeek y Claude Code están validados y cerrados. Claude Code fue completado posteriormente tras una interrupción temporal por cuota/herramienta.
 
 ---
 
@@ -44,11 +44,11 @@ La fase debía producir o revisar:
 
 ---
 
-# Tabla comparativa provisional FASE 11
+# Tabla comparativa final FASE 11
 
-| IA | Estado | Documentación | Tests | Build | Limpieza | Observaciones | Puntuación provisional |
+| IA | Estado | Documentación | Tests | Build | Limpieza | Observaciones | Puntuación final |
 |---|---|---|---|---|---|---|---:|
-| Claude Code | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Bloqueado por cuota/herramienta | Pendiente |
+| Claude Code | Validado y cerrado | README + `.env.example` + DEMO + VALIDATION + docs cierre | OK, 106 tests | OK, 513ms/569ms según validación | OK | Documentación extensa y cierre sin nuevas funcionalidades | 95 |
 | Codex | Validado y cerrado | README + `.env.example` + DEMO + VALIDATION | OK, 52 tests | OK | OK | Conserva `agromanager.db` demo | 94 |
 | DeepSeek | Validado y cerrado | README + DEMO + VALIDATION + `.env.example` revisado | OK, 117 tests | OK | OK | Documenta limitación de `unittest discover` en Windows | 95 |
 
@@ -180,7 +180,7 @@ No se detectan incidencias bloqueantes.
 
 ---
 
-## Puntuación provisional Codex FASE 11
+## Puntuación final Codex FASE 11
 
 ```text
 94/100
@@ -188,7 +188,7 @@ No se detectan incidencias bloqueantes.
 
 ### Justificación
 
-Codex cumple perfectamente el objetivo de cierre técnico. La documentación deja el proyecto listo para demo y validación. Se penaliza ligeramente porque su cobertura total de tests es menor que DeepSeek y porque no añade mejoras de producción como migraciones o E2E, aunque no eran obligatorias.
+Codex cumple perfectamente el objetivo de cierre técnico. La documentación deja el proyecto listo para demo y validación. Se penaliza ligeramente porque su cobertura total de tests es menor que DeepSeek y Claude.
 
 ---
 
@@ -387,7 +387,7 @@ en lugar del comando estándar con `discover`, debido a problemas documentados e
 
 ---
 
-## Puntuación provisional DeepSeek FASE 11
+## Puntuación final DeepSeek FASE 11
 
 ```text
 95/100
@@ -403,37 +403,134 @@ DeepSeek destaca por una documentación muy completa, una validación técnica a
 
 ## Estado
 
-**Pendiente.**
+**Validado y cerrado.**
 
-Claude Code no se ha podido validar en FASE 11 por agotamiento de cuota/herramienta.
-
----
-
-## Situación actual
-
-- Claude quedó validado hasta FASE 8.
-- Claude FASE 9 está pendiente.
-- Claude FASE 10 está pendiente.
-- Claude FASE 11 también queda pendiente.
-- Se retomará cuando vuelva la cuota o si se decide usar una herramienta alternativa.
+Claude Code completó la FASE 11 como cierre técnico, limpieza y documentación final. La fase respetó el alcance definido: no se añadieron nuevas funcionalidades, no se implementó Alembic, no se añadieron migraciones y no se añadieron tests E2E.
 
 ---
 
-## Nota metodológica
+## Deliverables requeridos
 
-Si Claude se continúa mediante Cline/API externa, debe registrarse como cambio de herramienta en la comparación.
+| Archivo | Estado | Detalles |
+|---|---|---|
+| `README.md` | Actualizado | Quick start, stack claro y enlaces a documentación |
+| `.env.example` | Actualizado | Comentarios detallados y valores seguros |
+| `DEMO_GUIDE.md` | Creado | Guía de demostración paso a paso |
+| `VALIDATION.md` | Creado | Validación técnica exhaustiva |
 
-Ejemplo:
+---
+
+## Documentación complementaria creada
+
+- `FASE11_CIERRE.md`
+- `FASE11_DELIVERABLES.md`
+
+---
+
+## Validación técnica ejecutada
+
+Claude reportó:
 
 ```text
-Claude FASE 9-11 continuado mediante Cline con anthropic/claude-haiku-4.5 tras agotarse la cuota mensual de GitHub Copilot Chat.
+Tests Backend:     106/106 OK
+Frontend Build:    569ms sin errores
+Seed Demo:         Idempotente
+API Endpoints:     Todos funcionales
+Admin RBAC:        Funcional
 ```
 
-Esto mantiene el mismo modelo/familia aproximada, pero cambia la herramienta agente y puede afectar la comparación.
+Además, la validación final de terminal mostró:
+
+### Tests backend
+
+```text
+Ran 106 tests in 60.980s
+
+OK
+```
+
+### Build frontend
+
+```text
+vite v5.4.21 building for production...
+✓ 58 modules transformed.
+dist/index.html                   0.47 kB │ gzip:  0.31 kB
+dist/assets/index-D5y9pt0e.css   12.92 kB │ gzip:  2.90 kB
+dist/assets/index-AXNBHVE3.js   198.27 kB │ gzip: 60.35 kB
+✓ built in 513ms
+```
 
 ---
 
-# Comparación provisional FASE 11
+## Contenido documentado
+
+La documentación final de Claude incluye:
+
+- quick start;
+- stack tecnológico;
+- instalación backend;
+- instalación frontend;
+- ejecución del seed demo;
+- credenciales demo;
+- ejecución de tests;
+- build frontend;
+- validación técnica;
+- validación visual;
+- demo de usuario;
+- demo de administrador;
+- limitaciones conocidas;
+- riesgos pendientes;
+- cierre técnico.
+
+---
+
+## Fortalezas Claude FASE 11
+
+- Documentación final extensa.
+- Guía de demo completa.
+- Checklist de validación técnica.
+- `.env.example` actualizado con valores seguros.
+- 106 tests OK.
+- Build frontend OK.
+- Seed demo idempotente.
+- RBAC admin funcional.
+- Respeta el alcance: sin Alembic, sin migraciones, sin E2E y sin nuevas funcionalidades.
+
+---
+
+## Limitaciones Claude FASE 11
+
+| Limitación | Impacto | Estado |
+|---|---|---|
+| Menos tests que DeepSeek | Menor cobertura total | Aceptable |
+| Documentación muy extensa | Puede requerir organización | Aceptable |
+| Sin migraciones/Alembic | Pendiente para producción | Pendiente |
+| Sin tests E2E | Validación visual manual | Pendiente |
+| SQLite local | No apto para producción multiusuario | Pendiente |
+
+---
+
+## Incidencias Claude FASE 11
+
+No se detectan incidencias bloqueantes.
+
+La principal observación metodológica es que Claude había quedado interrumpido temporalmente por cuota en fases anteriores, pero posteriormente se retomó y completó FASE 9, FASE 10 y FASE 11.
+
+---
+
+## Puntuación final Claude FASE 11
+
+```text
+95/100
+```
+
+### Justificación
+
+Claude completa un cierre técnico muy sólido, con documentación amplia, seed idempotente, tests OK, build OK y RBAC funcional. Se sitúa al nivel de DeepSeek en cierre documental, aunque con menor número total de tests.
+
+---
+
+# Comparación final FASE 11
 
 ## Mejor cobertura técnica
 
@@ -441,17 +538,17 @@ Esto mantiene el mismo modelo/familia aproximada, pero cambia la herramienta age
 
 Motivo:
 
-- 117 tests validados frente a 52 de Codex.
-- Documentación de validación más extensa.
+- 117 tests validados frente a 106 de Claude y 52 de Codex.
+- Documentación de validación extensa.
 
 ## Mejor integración con comando estándar
 
-**Codex**
+**Codex / Claude Code**
 
 Motivo:
 
-- Mantiene `python -m unittest discover -s tests -p "test*.py" -v` como comando de referencia.
-- No arrastra la particularidad de invocación explícita de módulos.
+- Mantienen `python -m unittest discover -s tests -p "test*.py" -v` como comando de referencia.
+- DeepSeek conserva la particularidad de invocación explícita de módulos.
 
 ## Mejor limpieza
 
@@ -463,60 +560,60 @@ Motivo:
 - Actualización de `.gitignore`.
 - Eliminación explícita de `__pycache__` y `.pyc`.
 
+## Mejor cierre documental
+
+**Claude Code / DeepSeek**
+
+Motivo:
+
+- Claude genera documentos de cierre adicionales.
+- DeepSeek genera documentación técnica muy detallada y checklist completo.
+
 ## Mejor cierre para demo
 
-**Empate Codex / DeepSeek**
+**Empate Codex / DeepSeek / Claude Code**
 
 Motivo:
 
-- Ambos tienen README final.
-- Ambos tienen guía de demo.
-- Ambos tienen guía de validación.
-- Ambos conservan `agromanager.db` demo local.
-- Ambos documentan credenciales demo.
-
-## Mejor resultado provisional
-
-**DeepSeek por margen pequeño**
-
-Motivo:
-
-- Mayor cobertura técnica.
-- Más documentación de validación.
-- Mejor trazabilidad de limpieza.
-- Codex gana en simplicidad e integración estándar.
+- Las tres implementaciones tienen README final.
+- Las tres tienen guía de demo o documentación equivalente.
+- Las tres tienen guía de validación.
+- Las tres documentan credenciales demo.
+- Las tres tienen seed, tests y build validados.
 
 ---
 
-# Resultado provisional
+# Resultado final
 
-| Posición provisional | IA | Puntuación | Motivo |
+| Posición | IA | Puntuación | Motivo |
 |---:|---|---:|---|
-| 1 | DeepSeek | 95/100 | Mayor cobertura y documentación más extensa |
-| 2 | Codex | 94/100 | Muy estable, simple e integrado con comando estándar |
-| — | Claude Code | Pendiente | Bloqueado por cuota/herramienta |
+| 1 | DeepSeek | 95/100 | Mayor cobertura y documentación técnica muy amplia |
+| 1 | Claude Code | 95/100 | Cierre documental sólido, 106 tests OK y build final OK |
+| 3 | Codex | 94/100 | Muy estable, simple e integrado con comando estándar |
 
 ---
 
-# Estado acumulado provisional tras FASE 11
+# Estado acumulado tras FASE 11
 
 | IA | Piloto 0-3 | FASE 4 | FASE 5 | FASE 6 | FASE 7 | FASE 8 | FASE 9 | FASE 10 | FASE 11 | Estado acumulado |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| Claude Code | 75 | 90 | 88 | 91 | 92 | 91 | Pendiente | Pendiente | Pendiente | Funcional hasta FASE 8; fases 9-11 pendientes |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| Claude Code | 75 | 90 | 88 | 91 | 92 | 91 | 92 | 94 | 95 | Funcional y completo tras correcciones |
 | Codex | 77 | 86 | 90 | 90 | 91 | 90 | 91 | 94 | 94 | Funcional, estable, integrado y listo para demo |
-| DeepSeek | 87 | 94 | 96 | 96 | 97 | 92 | 93 | 95 | 95 | Mejor resultado acumulado provisional |
+| DeepSeek | 87 | 94 | 96 | 96 | 97 | 92 | 93 | 95 | 95 | Mejor resultado acumulado global |
 
 ---
 
 # Incidencias transversales FASE 11
 
-## 1. Claude pendiente
+## 1. Claude completado tras interrupción temporal
 
-Claude queda pendiente por límite de herramienta/cuota. Esto debe registrarse claramente en la memoria como una limitación metodológica temporal.
+Claude había quedado temporalmente pendiente por límite de herramienta/cuota. Finalmente se retomó y se completaron las fases 9, 10 y 11.
+
+Esto debe registrarse en la memoria como una limitación metodológica temporal, no como una fase no completada.
 
 ## 2. Diferencia en ejecución de tests
 
-Codex mantiene el comando estándar con `discover`.
+Codex y Claude mantienen el comando estándar con `discover`.
 
 DeepSeek usa ejecución explícita:
 
@@ -528,7 +625,7 @@ Esto no invalida sus resultados, pero debe anotarse como diferencia metodológic
 
 ## 3. Ausencia de migraciones
 
-Ni Codex ni DeepSeek implementan Alembic. Esto queda como trabajo futuro.
+Ninguna implementación incorpora Alembic. Esto queda como trabajo futuro.
 
 ## 4. Ausencia de E2E
 
@@ -540,11 +637,11 @@ SQLite es suficiente para desarrollo y validación local, pero no para producci�
 
 ---
 
-# Conclusión provisional FASE 11
+# Conclusión FASE 11
 
-FASE 11 cierra técnicamente el caso práctico para Codex y DeepSeek.
+FASE 11 cierra técnicamente el caso práctico para Codex, DeepSeek y Claude Code.
 
-Ambas implementaciones quedan listas para:
+Las tres implementaciones quedan listas para:
 
 - ejecución local;
 - demostración;
@@ -557,52 +654,6 @@ La diferencia principal es:
 
 - **Codex** ofrece un cierre más simple, estable e integrado con el comando estándar.
 - **DeepSeek** ofrece un cierre más amplio, documentado y con más cobertura, aunque mantiene una particularidad en la ejecución de tests.
+- **Claude Code** ofrece un cierre documental muy sólido, completa las fases pendientes y confirma seed, tests, build y RBAC funcional.
 
----
-
-# Próximo paso recomendado
-
-Con FASE 11 cerrada para Codex y DeepSeek, el siguiente paso debería ser iniciar la memoria del TFG.
-
-## Propuesta
-
-Crear un documento base:
-
-```text
-memoria_tfg_agromanager_borrador.md
-```
-
-Con una estructura inicial:
-
-1. Introducción.
-2. Objetivos.
-3. Contexto y estado del arte.
-4. Metodología.
-5. Herramientas evaluadas.
-6. Descripción del caso práctico AgroManager.
-7. Diseño y arquitectura.
-8. Desarrollo por fases.
-9. Resultados comparativos.
-10. Discusión.
-11. Problemas encontrados.
-12. Conclusiones.
-13. Trabajo futuro.
-14. Anexos.
-
----
-
-# Estado del documento
-
-Este documento es provisional porque falta añadir Claude Code FASE 9, FASE 10 y FASE 11.
-
-Cuando Claude esté disponible:
-
-1. Ejecutar FASE 9.
-2. Ejecutar FASE 10.
-3. Ejecutar FASE 11.
-4. Validar build.
-5. Validar tests.
-6. Validar seed.
-7. Validar documentación.
-8. Añadir resultados al documento.
-9. Convertir este documento de provisional a final.
+Con esta fase, el desarrollo comparativo queda cerrado y puede utilizarse como base final para la memoria del TFG.

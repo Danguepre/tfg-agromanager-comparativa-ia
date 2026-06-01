@@ -1,0 +1,25 @@
+FASE 8 — Build frontend — Claude Code
+
+Comando ejecutado:
+
+```bash
+cd C:\Users\danie\Desktop\tfg\tfg-claude\frontend
+npm run build
+```
+
+Resultado observado:
+
+```text
+vite v5.4.21 building for production...
+✓ 51 modules transformed.
+dist/index.html                   0.47 kB │ gzip:  0.31 kB
+dist/assets/index-Dl7NhFS7.css   10.30 kB │ gzip:  2.45 kB
+dist/assets/index-CED9LfOb.js   184.86 kB │ gzip: 58.44 kB
+✓ built in 502ms
+```
+
+Observaciones:
+
+- `npm install` reportó 2 vulnerabilidades moderadas.
+- `npm run bui` fue un error tipográfico del comando, no una incidencia del proyecto.
+- `npm run build` terminó correctamente.

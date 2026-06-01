@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { authRegister, authLogin } from '../api/api'
+import { authRegister, authLogin, parseJwt } from '../api/api'
 import { useAuth } from '../context/AuthContext'
 import './Auth.css'
 
@@ -24,8 +24,23 @@ export function Register() {
 
       // Login automático después del registro
       const response = await authLogin(email, password)
-      const user = response.user || { email, name, id: response.user_id }
-      login(user, response.access_token)
+      const token = response.access_token
+
+      // Decodificar JWT para extraer user_id y role
+      const decoded = parseJwt(token)
+      if (!decoded) {
+        throw new Error('Error decodificando token JWT')
+      }
+
+      // Construir usuario con datos del JWT + nombre del formulario
+      const user = {
+        id: decoded.user_id,
+        email: email,
+        role: decoded.role,
+        name: name,
+      }
+
+      login(user, token)
       navigate('/dashboard')
     } catch (err) {
       setError(err.data?.detail || err.message || 'Error en registro')

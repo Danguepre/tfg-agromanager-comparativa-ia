@@ -1,3 +1,5 @@
-Pendiente.
+npm run build
 
-Pegar aquí la salida completa del build frontend.
+vite v5.4.21 building for production...
+58 modules transformed.
+built in 569ms

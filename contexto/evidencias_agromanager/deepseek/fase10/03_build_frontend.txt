@@ -1,9 +1,5 @@
-Comando ejecutado:
-
 cd frontend
 npm run build
-
-Resultado tras corrección:
 
 built in 582ms
 dist/index.html                  0.33 kB

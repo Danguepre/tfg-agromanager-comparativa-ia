@@ -1,3 +1,5 @@
-# Incidencias — Claude FASE11
+# Incidencias — Claude FASE 11
 
-Pendiente de completar.
+No se detectaron incidencias bloqueantes.
+
+Claude mencionó previamente Alembic como posible siguiente paso, pero en FASE 11 se respetó el alcance correcto: cierre técnico, limpieza y documentación final.

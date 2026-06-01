@@ -1,25 +1,10 @@
-# Validación visual — Claude FASE10
+# Validación visual — Claude FASE 10
 
-## Checklist usuario normal
-
-- [ ] Login usuario normal
-- [ ] Dashboard usuario
-- [ ] Mis cultivos
-- [ ] Catálogo
-- [ ] Calendario
-- [ ] Tareas
-- [ ] Logout
-
-## Checklist admin
-
-- [ ] Login admin
-- [ ] Enlace admin visible
-- [ ] Dashboard admin
-- [ ] Admin usuarios
-- [ ] Admin cultivos
-- [ ] Admin tareas
-- [ ] Logout
-
-## Observaciones
-
--
+- [x] Seed demo ejecutado correctamente.
+- [x] Login admin con `admin@test.com / admin123`.
+- [x] Login usuario con `user@test.com / user123`.
+- [x] Catálogo con 5 cultivos públicos.
+- [x] Usuario normal con 2 cultivos personales.
+- [x] Tareas pending/completed.
+- [x] Panel admin con datos.
+- [x] Build frontend OK.
