@@ -1,0 +1,9 @@
+npm run build
+
+vite v5.4.21 building for production...
+58 modules transformed.
+dist/index.html                   0.47 kB
+dist/assets/index-AXNBHVE3.js   198.27 kB
+dist/assets/index-D5y9pt0e.css   12.92 kB
+
+built in 581ms

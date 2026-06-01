@@ -1,0 +1,5 @@
+python -m unittest discover -s tests -p "test*.py" -v
+
+Ran 104 tests in 73.391s
+
+OK

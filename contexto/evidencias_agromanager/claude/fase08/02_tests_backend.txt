@@ -1,0 +1,16 @@
+FASE 8 — Tests backend — Claude Code
+
+Comando ejecutado:
+
+```bash
+cd C:\Users\danie\Desktop\tfg\tfg-claude
+python -m unittest discover -s tests -p "test*.py" -v
+```
+
+Resultado final tras corrección:
+
+```text
+Ran 83 tests in 55.719s
+
+OK
+```

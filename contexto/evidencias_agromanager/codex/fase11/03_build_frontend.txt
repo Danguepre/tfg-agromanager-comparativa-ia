@@ -1,0 +1,4 @@
+npm.cmd run build
+
+Frontend build OK.
+Vite terminó correctamente.

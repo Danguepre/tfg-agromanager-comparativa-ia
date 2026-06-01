@@ -1,0 +1,5 @@
+npm.cmd run build
+
+built in 600ms
+dist/index.html 0.33kB
+dist/assets/index-Byj7vGJZ.js 235kB

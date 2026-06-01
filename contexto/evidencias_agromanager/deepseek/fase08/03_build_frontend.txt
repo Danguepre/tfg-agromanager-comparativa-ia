@@ -1,0 +1,23 @@
+FASE 8 — Build frontend — DeepSeek
+
+Comando ejecutado:
+
+```bash
+cd C:\Users\danie\Desktop\tfg\tfg-deepseek\frontend
+npm run build
+```
+
+Resultado:
+
+```text
+vite v5.4.21 building for production...
+✓ 52 modules transformed.
+dist/index.html                  0.33 kB │ gzip:  0.25 kB
+dist/assets/index-BNooW832.js  213.47 kB │ gzip: 65.42 kB
+✓ built in 528ms
+```
+
+Observaciones:
+
+- `npm install` reportó 2 vulnerabilidades moderadas.
+- Build correcto.

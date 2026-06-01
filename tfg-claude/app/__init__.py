@@ -1,0 +1,1 @@
+"""AgroManager API - Backend FastAPI."""

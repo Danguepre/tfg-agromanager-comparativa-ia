@@ -163,3 +163,20 @@ La solución será evaluada en base a:
 - No se deben reutilizar soluciones generadas por otras herramientas de IA  
 
 ---
+## Configuración de Google OAuth
+
+Para habilitar el inicio de sesión con Google en el backend, crea un archivo `.env` en la raíz del proyecto con estas variables:
+
+```env
+APP_ENV=development
+DATABASE_URL=postgresql://postgres:admin@localhost:5432/tfg_db
+GOOGLE_CLIENT_ID=tu-google-client-id
+GOOGLE_CLIENT_SECRET=tu-google-client-secret
+GOOGLE_OAUTH_REDIRECT=http://127.0.0.1:5173/auth/google/callback
+FRONTEND_URL=http://127.0.0.1:5173
+CORS_ORIGINS=http://127.0.0.1:5173
+```
+
+Luego instala las dependencias y arranca el backend. El flujo de Google iniciará en `http://127.0.0.1:5173/auth/google` y redirigirá al frontend con el token.
+
+---

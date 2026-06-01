@@ -1,0 +1,16 @@
+FASE 8 — Tests backend — Codex
+
+Comando ejecutado:
+
+```bash
+cd C:\Users\danie\Desktop\tfg\tfg-codex
+python -m unittest discover -s tests -p "test*.py" -v
+```
+
+Resultado:
+
+```text
+Ran 50 tests in 66.797s
+
+OK
+```

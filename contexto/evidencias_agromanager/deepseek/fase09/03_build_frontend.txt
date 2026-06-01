@@ -1,0 +1,8 @@
+cd frontend
+npm run build
+
+57 modules transformed.
+dist/index.html                  0.33 kB
+dist/assets/index-Byj7vGJZ.js  235.03 kB
+
+built in 671ms
