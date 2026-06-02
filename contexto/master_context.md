@@ -1,6 +1,6 @@
 # Contexto maestro para reconstruccion con IA
 
-Este documento resume el estado final del proyecto `tfg-copilot` para generar prompts reproducibles y comparar el resultado de diferentes IAs. La idea es que todas reciban el mismo contexto, las mismas fases y los mismos criterios de aceptacion.
+Este documento resume el estado final del proyecto `tfg-propio` para generar prompts reproducibles y comparar el resultado de diferentes IAs. La idea es que todas reciban el mismo contexto, las mismas fases y los mismos criterios de aceptacion.
 
 ## 1. Objetivo del experimento
 

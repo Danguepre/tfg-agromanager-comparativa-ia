@@ -31,7 +31,6 @@ No se evalúan todavía:
 | Claude Code | Claude 4.5 | `tfg-claude/` | Backend, tests piloto y frontend mínimo validados |
 | Codex | OpenAI / Codex | `tfg-codex/` | Tests piloto y frontend mínimo validados |
 | DeepSeek | DeepSeek mediante Cline/VS Code | `tfg-deepseek/` | Backend, tests piloto, frontend y documentación corregida validados |
-| GitHub Copilot | GPT-4.1 | `tfg-copilot-test/` | Pendiente |
 
 ---
 
@@ -76,7 +75,6 @@ La reconstrucción piloto se considera válida si cumple:
 | Claude Code | 7 | 15/20 provisional | Pendiente | Pendiente | 15/20 provisional | Pendiente | Pendiente | Backend arranca tras 3 correcciones. Tests piloto pasan tras corregir configuración de SQLite en tests. Frontend arranca tras corregir import relativo incorrecto en `src/App.jsx`. Desviaciones pendientes: usa `sqlite:///./app.db` en desarrollo y los tests usan `POST /auth/register` en vez de `POST /users/`. | 6 prompts de corrección. |
 | Codex | 3 | Pendiente de validación manual con `uvicorn` | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Tests no ejecutaban inicialmente porque usaban `pytest`. Tras corregirlo, apareció falta de dependencia `pydantic_settings`. Después de la segunda corrección, los tests funcionan correctamente y el frontend arranca sin errores. | 2 prompts de corrección. |
 | DeepSeek | 3 | 18/20 provisional | Pendiente | Pendiente | 17/20 provisional | Pendiente | Pendiente | Inicialmente `unittest` no detectaba tests: `Ran 0 tests`. Tras corrección, ejecuta 17 tests correctamente. El riesgo de crear admin desde registro público queda cubierto por `test_register_cannot_become_admin`. Backend arranca, frontend compila correctamente y README fue corregido para no documentar creación insegura de admin. | 2 prompts de corrección. |
-| Copilot GPT-4.1 | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente |
 
 ---
 
@@ -109,10 +107,6 @@ La reconstrucción piloto se considera válida si cumple:
 | 1 | Generación inicial | Se pidió implementar el mismo piloto dentro de `tfg-deepseek/`. | DeepSeek indicó que el proyecto estaba completo y que las pruebas funcionales pasaban, pero el comando estándar de `unittest` ejecutó 0 tests. |
 | 2 | Corrección 1 | Se pidió crear tests reales con `unittest` y `fastapi.testclient.TestClient`, además de validar que un usuario no pueda registrarse como admin enviando `role: admin`. | DeepSeek añadió tests detectables por `unittest`. Resultado: `Ran 17 tests in 7.715s`, `OK`. Backend y frontend quedan validados posteriormente. |
 | 3 | Corrección 2 | Se pidió corregir solo el README porque seguía documentando creación insegura de admin con `role: admin`. | El README ahora aclara que `POST /users/` crea siempre usuarios `user` y que no existe todavía un mecanismo seguro para crear el primer admin. |
-
-### GitHub Copilot GPT-4.1
-
-Pendiente.
 
 ---
 
@@ -1828,6 +1822,3 @@ http://127.0.0.1:8000/docs
 5. Revisar estructura real de modelos y schemas.
 6. Asignar puntuación provisional completa a DeepSeek.
 
-### GitHub Copilot GPT-4.1
-
-Pendiente de empezar cuando Claude, Codex y DeepSeek tengan una primera validación comparable.
