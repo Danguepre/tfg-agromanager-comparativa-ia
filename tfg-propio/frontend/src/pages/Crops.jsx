@@ -218,10 +218,6 @@ export default function Crops({ token }) {
 
       await createCrop(token, cropData);
 
-      if (wateringFrequency !== "daily" || waterAmount || irrigationRecommendations ||
-          sunExposure !== "full_sun" || minTemp || maxTemp || frostTolerance) {
-      }
-
       resetForm();
 
       setMessage("Cultivo creado correctamente");

@@ -3,14 +3,7 @@ import os
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-try:
-    from dotenv import load_dotenv
-except ImportError:  # pragma: no cover - optional dependency
-    load_dotenv = None
-
-
-if load_dotenv is not None:
-    load_dotenv()
+from app.config import ENV_PATH as _ENV_PATH  # Import also loads the shared .env file.
 
 
 DEFAULT_DATABASE_URL = "postgresql://postgres:admin@localhost:5432/tfg_db"

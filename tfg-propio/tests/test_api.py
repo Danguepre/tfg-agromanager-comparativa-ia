@@ -2,6 +2,7 @@ import os
 import unittest
 from datetime import date
 from pathlib import Path
+from unittest.mock import patch
 
 os.environ["APP_ENV"] = "test"
 os.environ["RUN_SEED"] = "0"
@@ -14,6 +15,7 @@ os.environ["GOOGLE_OAUTH_REDIRECT"] = "http://127.0.0.1:8000/auth/google/callbac
 from fastapi.testclient import TestClient
 
 from app.auth import hash_password
+from app.config import LOCAL_SECRET_KEY, get_secret_key
 from app.database import Base, SessionLocal, engine
 from app.main import app
 from app.models.crop import Crop
@@ -23,6 +25,19 @@ from app.models.planting_calendar import PlantingCalendar
 from app.models.task import Task
 from app.models.task_crop import TaskCrop
 from app.models.user import User
+
+
+class ConfigTests(unittest.TestCase):
+    def test_secret_key_uses_local_fallback_in_development(self):
+        with patch.dict(os.environ, {"APP_ENV": "development"}, clear=False):
+            os.environ.pop("SECRET_KEY", None)
+            self.assertEqual(get_secret_key(), LOCAL_SECRET_KEY)
+
+    def test_secret_key_is_required_in_production(self):
+        with patch.dict(os.environ, {"APP_ENV": "production"}, clear=False):
+            os.environ.pop("SECRET_KEY", None)
+            with self.assertRaises(RuntimeError):
+                get_secret_key()
 
 
 class ApiTestCase(unittest.TestCase):
