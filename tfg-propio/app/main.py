@@ -3,11 +3,7 @@ import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from dotenv import load_dotenv
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-ENV_PATH = BASE_DIR / ".env"
-load_dotenv(dotenv_path=ENV_PATH)
+from app.config import ENV_PATH, get_app_env
 
 logger = logging.getLogger("uvicorn.error")
 google_client_id = os.getenv("GOOGLE_CLIENT_ID")
@@ -29,10 +25,6 @@ from app.services.image_search import ensure_crop_uploads_dir
 
 def is_truthy(value: str | None) -> bool:
     return (value or "").strip().lower() in {"1", "true", "yes", "on"}
-
-
-def get_app_env() -> str:
-    return (os.getenv("APP_ENV", "development")).strip().lower()
 
 
 def get_cors_origins() -> list[str]:

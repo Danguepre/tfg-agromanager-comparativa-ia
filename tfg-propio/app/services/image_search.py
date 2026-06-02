@@ -1,9 +1,10 @@
-import os
 import uuid
 from pathlib import Path
 from urllib.parse import urlparse
 
 import httpx
+
+from app.config import get_pexels_api_key
 
 UPLOADS_DIR = Path("uploads")
 CROPS_UPLOADS_DIR = UPLOADS_DIR / "crops"
@@ -11,7 +12,6 @@ DEFAULT_IMAGE_FILENAME = "default.jpg"
 DEFAULT_IMAGE_PATH = CROPS_UPLOADS_DIR / DEFAULT_IMAGE_FILENAME
 DEFAULT_IMAGE_URL = f"/uploads/crops/{DEFAULT_IMAGE_FILENAME}"
 PEXELS_SEARCH_URL = "https://api.pexels.com/v1/search"
-PEXELS_API_KEY = "SCtNi9A0xue4SGQDsccF3xR8vVzS5W1Rd4n8o4G1fiSS9iSW6SVRPD09"
 ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
 
@@ -68,7 +68,7 @@ def save_uploaded_crop_image(upload_file) -> str:
 
 
 def fetch_pexels_image_url(crop_name: str, crop_type: str | None = None) -> str | None:
-    api_key = PEXELS_API_KEY
+    api_key = get_pexels_api_key()
     if not api_key:
         print("❌ API key de Pexels no configurada")
         return None
