@@ -70,7 +70,7 @@ def save_uploaded_crop_image(upload_file) -> str:
 def fetch_pexels_image_url(crop_name: str, crop_type: str | None = None) -> str | None:
     api_key = get_pexels_api_key()
     if not api_key:
-        print("❌ API key de Pexels no configurada")
+        print("API key de Pexels no configurada")
         return None
 
     query_parts = [crop_name.strip()]
@@ -83,7 +83,7 @@ def fetch_pexels_image_url(crop_name: str, crop_type: str | None = None) -> str 
     params = {"query": query, "per_page": 1, "orientation": "landscape"}
 
     try:
-        print(f"📡 Consultando Pexels API con query: '{query}'")
+        print(f"Consultando Pexels API con query: '{query}'")
         with httpx.Client(timeout=10.0, follow_redirects=True) as client:
             response = client.get(PEXELS_SEARCH_URL, headers=headers, params=params)
             response.raise_for_status()
@@ -91,21 +91,21 @@ def fetch_pexels_image_url(crop_name: str, crop_type: str | None = None) -> str 
         payload = response.json()
         photos = payload.get("photos") or []
         if not photos:
-            print(f"⚠️ Pexels no retornó fotos para: '{query}'")
+            print(f"Pexels no retorno fotos para: '{query}'")
             return None
 
         src = (photos[0] or {}).get("src") or {}
         image_url = src.get("large2x") or src.get("large") or src.get("original")
-        print(f"✅ Imagen encontrada: {image_url}")
+        print(f"Imagen encontrada: {image_url}")
         return image_url
-    except (httpx.HTTPError, ValueError, KeyError) as e:
-        print(f"❌ Error consultando Pexels: {e}")
+    except (httpx.HTTPError, ValueError, KeyError) as exc:
+        print(f"Error consultando Pexels: {exc}")
         return None
 
 
 def download_and_store_crop_image(image_url: str) -> str | None:
     try:
-        print(f"⬇️ Descargando imagen: {image_url}")
+        print(f"Descargando imagen: {image_url}")
         with httpx.Client(timeout=15.0, follow_redirects=True) as client:
             response = client.get(image_url)
             response.raise_for_status()
@@ -114,28 +114,27 @@ def download_and_store_crop_image(image_url: str) -> str | None:
         if extension == ".jpg":
             extension = get_extension_from_url(image_url)
 
-        print(f"💾 Almacenando con extensión: {extension}")
+        print(f"Almacenando con extension: {extension}")
         result = save_bytes_to_crop_uploads(response.content, extension)
-        print(f"✅ Guardado en: {result}")
+        print(f"Guardado en: {result}")
         return result
-    except (httpx.HTTPError, OSError) as e:
-        print(f"❌ Error descargando imagen: {e}")
+    except (httpx.HTTPError, OSError) as exc:
+        print(f"Error descargando imagen: {exc}")
         return None
 
 
 def fetch_and_store_crop_image(crop_name: str, crop_type: str | None = None) -> str:
-    print(f"🔍 Buscando imagen para: {crop_name} ({crop_type})")
+    print(f"Buscando imagen para: {crop_name} ({crop_type})")
     remote_image_url = fetch_pexels_image_url(crop_name, crop_type)
     if remote_image_url:
-        print(f"✅ URL encontrada en Pexels: {remote_image_url}")
+        print(f"URL encontrada en Pexels: {remote_image_url}")
         stored_image_url = download_and_store_crop_image(remote_image_url)
         if stored_image_url:
-            print(f"✅ Imagen guardada en: {stored_image_url}")
+            print(f"Imagen guardada en: {stored_image_url}")
             return stored_image_url
-        else:
-            print("❌ Error al descargar/guardar imagen")
+        print("Error al descargar/guardar imagen")
     else:
-        print("❌ No se encontró imagen en Pexels")
+        print("No se encontro imagen en Pexels")
 
-    print(f"ℹ️ Usando imagen por defecto")
+    print("Usando imagen por defecto")
     return get_default_crop_image_url()

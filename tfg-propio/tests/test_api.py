@@ -85,6 +85,12 @@ class ApiTestCase(unittest.TestCase):
             user_id=None,
             is_public=True,
         )
+        self.catalog_pepper = self.create_crop(
+            name="Pimiento California",
+            type="hortaliza",
+            user_id=None,
+            is_public=True,
+        )
         self.catalog_lettuce = self.create_crop(
             name="Lechuga Batavia",
             type="hoja",
@@ -360,6 +366,11 @@ class CatalogAndMyCropsTests(ApiTestCase):
         copy_id = copied.json()["id"]
         self.assertEqual(copied.json()["source_crop_id"], self.catalog_tomato.id)
 
+        catalog_after_copy = self.client.get("/crops/published?name=Tomate&page=1&page_size=12", headers=headers)
+        self.assertEqual(catalog_after_copy.status_code, 200)
+        self.assertEqual(catalog_after_copy.json()["total"], 1)
+        self.assertEqual(catalog_after_copy.json()["items"][0]["id"], self.catalog_tomato.id)
+
         update = self.client.put(f"/crops/{copy_id}", headers=headers, json={
             "name": "Tomate Copia Usuario",
             "type": "hortaliza editada",
@@ -374,6 +385,38 @@ class CatalogAndMyCropsTests(ApiTestCase):
         original = self.client.get(f"/crops/{self.catalog_tomato.id}", headers=self.auth_headers("admin@example.com"))
         self.assertEqual(original.status_code, 200)
         self.assertEqual(original.json()["name"], "Tomate Roma")
+
+    def test_user_created_crop_is_published_and_image_can_be_updated(self):
+        headers = self.auth_headers("user@example.com")
+        created = self.client.post(
+            "/crops/",
+            headers=headers,
+            data={
+                "name": "Pepino Compartido",
+                "type": "hortaliza",
+                "life_cycle": "anual",
+                "user_id": str(self.user.id),
+                "is_public": "false",
+            },
+            files={"image": ("pepino.jpg", b"fake image", "image/jpeg")},
+        )
+        self.assertEqual(created.status_code, 200, created.text)
+        crop_id = created.json()["id"]
+        self.assertTrue(created.json()["is_public"])
+
+        catalog = self.client.get("/crops/published?name=Pepino Compartido", headers=headers)
+        self.assertEqual(catalog.status_code, 200)
+        self.assertEqual(catalog.json()["total"], 1)
+        self.assertEqual(catalog.json()["items"][0]["id"], crop_id)
+
+        updated_image = self.client.put(
+            f"/crops/{crop_id}/image",
+            headers=headers,
+            files={"image": ("pepino-nuevo.jpg", b"new fake image", "image/jpeg")},
+        )
+        self.assertEqual(updated_image.status_code, 200, updated_image.text)
+        self.assertNotEqual(updated_image.json()["image_url"], created.json()["image_url"])
+        self.assertTrue(updated_image.json()["image_url"].startswith("/uploads/crops/"))
 
     def test_my_crops_are_user_scoped_and_permissions_are_enforced(self):
         user_headers = self.auth_headers("user@example.com")
@@ -469,6 +512,42 @@ class CalendarTests(ApiTestCase):
 
         other_events = self.client.get("/calendar/events", headers=other_headers)
         self.assertEqual(other_events.status_code, 200)
+
+
+class TaskTests(ApiTestCase):
+    def test_user_can_update_task_details_and_assigned_crop(self):
+        headers = self.auth_headers("user@example.com")
+        task = Task(
+            user_id=self.user.id,
+            name="Regar cultivo",
+            description="Riego inicial",
+            status="pending",
+        )
+        self.db.add(task)
+        self.db.flush()
+        self.db.add(TaskCrop(task_id=task.id, crop_id=self.user_crop.id))
+        self.db.commit()
+
+        updated = self.client.put(f"/tasks/{task.id}", headers=headers, json={
+            "user_id": self.user.id,
+            "name": "Revisar riego",
+            "description": "Comprobar humedad y ajustar riego",
+            "status": "in_progress",
+        })
+        self.assertEqual(updated.status_code, 200, updated.text)
+        self.assertEqual(updated.json()["name"], "Revisar riego")
+        self.assertEqual(updated.json()["description"], "Comprobar humedad y ajustar riego")
+        self.assertEqual(updated.json()["status"], "in_progress")
+
+        reassigned = self.client.put(f"/tasks/{task.id}/crop", headers=headers, json={
+            "task_id": task.id,
+            "crop_id": self.incomplete_crop.id,
+        })
+        self.assertEqual(reassigned.status_code, 200, reassigned.text)
+
+        fetched = self.client.get(f"/tasks/{task.id}", headers=headers)
+        self.assertEqual(fetched.status_code, 200)
+        self.assertEqual(fetched.json()["crop_id"], self.incomplete_crop.id)
 
 
 if __name__ == "__main__":

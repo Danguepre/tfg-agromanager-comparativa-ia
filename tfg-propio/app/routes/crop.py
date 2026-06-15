@@ -42,8 +42,6 @@ def create_crop(
 
     if current_user_role != "admin" and user_id != current_user_id:
         raise HTTPException(status_code=403, detail="Cannot create crop for another user")
-    if current_user_role != "admin" and is_public:
-        raise HTTPException(status_code=403, detail="Only admins can publish crops")
 
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
@@ -63,7 +61,7 @@ def create_crop(
         life_cycle=life_cycle,
         image_url=image_url,
         user_id=user_id,
-        is_public=is_public,
+        is_public=True if current_user_role != "admin" else is_public,
     )
 
     db.add(new_crop)
@@ -103,16 +101,22 @@ def get_published_crops(
 ):
     user_source_ids = get_user_catalog_source_ids(db, current_user["user_id"])
 
+    catalog_filters = [
+        Crop.is_public.is_(True),
+        Crop.source_crop_id.is_(None),
+    ]
+
     available_types = [
         row[0]
         for row in db.query(Crop.type)
+        .filter(*catalog_filters)
         .filter(Crop.type.isnot(None), Crop.type != "")
         .distinct()
         .order_by(Crop.type)
         .all()
     ]
 
-    query = db.query(Crop)
+    query = db.query(Crop).filter(*catalog_filters)
 
     if name:
         query = query.filter(Crop.name.ilike(f"%{name.strip()}%"))
@@ -349,6 +353,33 @@ def update_crop(
     db.commit()
     db.refresh(crop)
 
+    return crop
+
+
+@router.put("/{crop_id}/image", response_model=CropResponse)
+def update_crop_image(
+    crop_id: int,
+    image: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    current_user_id = current_user["user_id"]
+    current_user_role = current_user["role"]
+
+    crop = db.query(Crop).filter(Crop.id == crop_id).first()
+
+    if not crop:
+        raise HTTPException(status_code=404, detail="Crop not found")
+    if current_user_role != "admin" and crop.user_id != current_user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this crop")
+
+    try:
+        crop.image_url = save_uploaded_crop_image(image)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    db.commit()
+    db.refresh(crop)
     return crop
 
 

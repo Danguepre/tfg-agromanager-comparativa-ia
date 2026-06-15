@@ -8,6 +8,7 @@ import {
   deleteCrop,
   getMyCrops,
   updateCrop,
+  updateCropImage,
   updateEnvironmental,
   updateIrrigation,
   upsertCalendarByCrop,
@@ -265,6 +266,15 @@ export default function Crops({ token }) {
   }, [loadCrops]);
 
   const loadCropIntoEditForm = (crop) => {
+    setImageFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
     setName(crop.name || "");
     setType(crop.type || "");
     setLifeCycle(crop.life_cycle || "anual");
@@ -342,7 +352,7 @@ export default function Crops({ token }) {
     setMessage(null);
 
     try {
-      const updated = await updateCrop(token, selectedCrop.id, {
+      let updated = await updateCrop(token, selectedCrop.id, {
         name: name.trim(),
         type: type.trim(),
         life_cycle: lifeCycle,
@@ -352,12 +362,26 @@ export default function Crops({ token }) {
         source_crop_id: selectedCrop.source_crop_id,
       });
 
+      if (imageFile) {
+        const imageData = new FormData();
+        imageData.append("image", imageFile);
+        updated = await updateCropImage(token, selectedCrop.id, imageData);
+      }
+
       const related = await upsertRelatedData(selectedCrop.id);
       const nextCrop = { ...updated, ...related };
 
       setCrops((prev) => prev.map((crop) => (crop.id === nextCrop.id ? nextCrop : crop)));
       setSelectedCrop(nextCrop);
       setEditMode(false);
+      setImageFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setPreviewUrl(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       setMessage("Cultivo actualizado correctamente");
     } catch (err) {
       setError(err.message || "No se pudo actualizar el cultivo");
@@ -448,7 +472,7 @@ export default function Crops({ token }) {
     }
   };
 
-  if (loading) return <p style={{ padding: "20px" }}>⏳ Cargando cultivos...</p>;
+  if (loading) return <p style={{ padding: "20px" }}>Cargando cultivos...</p>;
 
   return (
     <>
@@ -478,11 +502,25 @@ export default function Crops({ token }) {
         .crop-modal-content::-webkit-scrollbar-thumb:hover {
           background: #2F6B33;
         }
+
+        .crop-form-grid {
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        }
+
+        @media (max-width: 720px) {
+          .crop-form-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .crop-modal-content {
+            width: min(100%, 100vw - 24px) !important;
+          }
+        }
       `}</style>
       <div style={page}>
         <header style={headerStyle}>
         <div>
-          <h1 style={titleStyle}>🌿 Mis cultivos</h1>
+          <h1 style={titleStyle}>Mis cultivos</h1>
           <p style={subtitleStyle}>
             Explora tus plantaciones con imágenes y datos clave en un diseño claro.
           </p>
@@ -496,10 +534,10 @@ export default function Crops({ token }) {
               setMessage(null);
             }}
           >
-            ➕ Añadir cultivo
+            Añadir cultivo
           </button>
           <button style={secondaryButton} onClick={() => loadCrops()}>
-            🔄 Actualizar
+            Actualizar
           </button>
         </div>
       </header>
@@ -511,7 +549,7 @@ export default function Crops({ token }) {
         <div style={modalOverlay}>
           <div className="crop-modal-content" style={createModalContent}>
             <div style={modalHeader}>
-              <h2 style={modalTitle}>🌱 Añadir nuevo cultivo</h2>
+              <h2 style={modalTitle}>Añadir nuevo cultivo</h2>
               <button
                 onClick={() => {
                   setShowCreateModal(false);
@@ -530,7 +568,7 @@ export default function Crops({ token }) {
 
               <div style={formSection}>
                 <h3 style={sectionTitle}>Información básica</h3>
-                <div style={formGrid}>
+                <div className="crop-form-grid" style={formGrid}>
                   <div style={formField}>
                     <label style={labelStyle}>
                       Nombre <span style={{ color: "#ef4444" }}>*</span>
@@ -588,7 +626,7 @@ export default function Crops({ token }) {
                   )}
 
                   <div style={formField}>
-                    <label style={labelStyle}>Imagen (opcional)</label>
+                    <label style={labelStyle}>Imagen</label>
                     <input
                       type="file"
                       accept="image/*"
@@ -612,8 +650,8 @@ export default function Crops({ token }) {
               </div>
 
               <div style={formSection}>
-                <h3 style={sectionTitle}>💧 Información de riego (opcional)</h3>
-                <div style={formGrid}>
+                <h3 style={sectionTitle}>Información de riego</h3>
+                <div className="crop-form-grid" style={formGrid}>
                   <div style={formField}>
                     <label style={labelStyle}>Frecuencia de riego</label>
                     <select
@@ -653,8 +691,8 @@ export default function Crops({ token }) {
               </div>
 
               <div style={formSection}>
-                <h3 style={sectionTitle}>🌡️ Requisitos ambientales (opcional)</h3>
-                <div style={formGrid}>
+                <h3 style={sectionTitle}>Requisitos ambientales</h3>
+                <div className="crop-form-grid" style={formGrid}>
                   <div style={formField}>
                     <label style={labelStyle}>Exposición solar</label>
                     <select
@@ -718,7 +756,7 @@ export default function Crops({ token }) {
                 Cancelar
               </button>
               <button style={primaryButton} onClick={handleCreateCrop} disabled={saving}>
-                {saving ? "Guardando..." : "🌱 Crear cultivo"}
+                {saving ? "Guardando..." : "Crear cultivo"}
               </button>
             </div>
           </div>
@@ -773,17 +811,17 @@ export default function Crops({ token }) {
                         style={toggleButton}
                         aria-label="Ver detalles"
                       >
-                        🔎
+                        Ver
                       </button>
                     </div>
 
                     <div style={badgeRow}>
                       <span style={badge}>Ciclo: {crop.life_cycle}</span>
                       {crop.irrigation && (
-                        <span style={badge}>💧 {translateWateringFrequency(crop.irrigation.watering_frequency)}</span>
+                        <span style={badge}>Riego: {translateWateringFrequency(crop.irrigation.watering_frequency)}</span>
                       )}
                       {crop.environmental && (
-                        <span style={badge}>🌡️ {crop.environmental.min_temp}°-{crop.environmental.max_temp}°</span>
+                        <span style={badge}>Temp: {crop.environmental.min_temp}°-{crop.environmental.max_temp}°</span>
                       )}
                     </div>
                   </div>
@@ -859,7 +897,7 @@ export default function Crops({ token }) {
                       <div style={editPanel}>
                         <div style={formSection}>
                           <h3 style={sectionTitle}>Información básica</h3>
-                          <div style={formGrid}>
+                          <div className="crop-form-grid" style={formGrid}>
                             <div style={formField}>
                               <label style={labelStyle}>Nombre</label>
                               <input value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />
@@ -876,12 +914,32 @@ export default function Crops({ token }) {
                                 <option value="perenne">Perenne</option>
                               </select>
                             </div>
+                            <div style={formField}>
+                              <label style={labelStyle}>Cambiar imagen</label>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                ref={fileInputRef}
+                                style={inputStyle}
+                              />
+                            </div>
                           </div>
+                          {previewUrl && (
+                            <div style={previewWrapper}>
+                              <p style={previewLabel}>Vista previa de la nueva imagen</p>
+                              <img
+                                src={previewUrl}
+                                alt="Vista previa del cultivo"
+                                style={previewImage}
+                              />
+                            </div>
+                          )}
                         </div>
 
                         <div style={formSection}>
                           <h3 style={sectionTitle}>Riego</h3>
-                          <div style={formGrid}>
+                          <div className="crop-form-grid" style={formGrid}>
                             <div style={formField}>
                               <label style={labelStyle}>Frecuencia</label>
                               <select value={wateringFrequency} onChange={(e) => setWateringFrequency(e.target.value)} style={inputStyle}>
@@ -904,7 +962,7 @@ export default function Crops({ token }) {
 
                         <div style={formSection}>
                           <h3 style={sectionTitle}>Ambiente</h3>
-                          <div style={formGrid}>
+                          <div className="crop-form-grid" style={formGrid}>
                             <div style={formField}>
                               <label style={labelStyle}>Exposición solar</label>
                               <select value={sunExposure} onChange={(e) => setSunExposure(e.target.value)} style={inputStyle}>
@@ -932,7 +990,7 @@ export default function Crops({ token }) {
 
                         <div style={formSection}>
                           <h3 style={sectionTitle}>Fases y quincenas</h3>
-                          <div style={formGrid}>
+                          <div className="crop-form-grid" style={formGrid}>
                             <PhaseSelectors label="Siembra" value={plantingStart} onChange={setPlantingStart} />
                             <PhaseSelectors label="Trasplante" value={transplantStart} onChange={setTransplantStart} />
                             <PhaseSelectors label="Cosecha" value={harvestStart} onChange={setHarvestStart} />
@@ -1031,7 +1089,7 @@ export default function Crops({ token }) {
                         alignSelf: "flex-start",
                       }}
                     >
-                      ➕ Crear Tarea
+                      Crear Tarea
                     </button>
 
                     <CropTasks cropId={selectedCrop.id} userId={currentUser?.user_id} token={token} />
@@ -1094,19 +1152,26 @@ const sectionTitle = {
 
 const formGrid = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-  gap: "16px",
-  marginBottom: "18px",
+  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+  columnGap: "24px",
+  rowGap: "18px",
+  marginBottom: "20px",
+  width: "100%",
+  minWidth: 0,
 };
 
 const inputStyle = {
   width: "100%",
+  maxWidth: "100%",
+  minWidth: 0,
+  boxSizing: "border-box",
   padding: "14px 16px",
   borderRadius: "16px",
   border: "1px solid #D7E7D8",
   background: "#F8FBF8",
   color: "#1F3D2E",
   fontSize: "0.98rem",
+  fontFamily: "inherit",
 };
 
 const primaryButton = {
@@ -1455,8 +1520,8 @@ const closeButton = {
 };
 
 const createModalContent = {
-  maxWidth: "800px",
-  width: "90%",
+  maxWidth: "860px",
+  width: "min(92vw, 860px)",
   maxHeight: "90vh",
   background: "white",
   borderRadius: "28px",
@@ -1489,6 +1554,7 @@ const modalBody = {
   flex: 1,
   overflowY: "auto",
   maxHeight: "calc(90vh - 140px)",
+  minWidth: 0,
 };
 
 const modalFooter = {
@@ -1504,12 +1570,14 @@ const formSection = {
   display: "flex",
   flexDirection: "column",
   gap: "16px",
+  minWidth: 0,
 };
 
 const formField = {
   display: "flex",
   flexDirection: "column",
   gap: "8px",
+  minWidth: 0,
 };
 
 const labelStyle = {

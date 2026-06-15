@@ -121,6 +121,22 @@ export async function registerRequest(payload) {
   return apiRequest("/users/", { method: "POST", body: payload, auth: false });
 }
 
+function cropFormData(payload) {
+  const form = new FormData();
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) form.set(key, value);
+  });
+  return form;
+}
+
+export function updateMyCrop(cropId, payload) {
+  return apiRequest(`/crops/${cropId}`, { method: "PUT", body: cropFormData(payload) });
+}
+
+export function deleteMyCrop(cropId) {
+  return apiRequest(`/crops/${cropId}`, { method: "DELETE" });
+}
+
 export function getAdminSummary() {
   return apiRequest("/admin/summary");
 }

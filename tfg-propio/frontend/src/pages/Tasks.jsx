@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getTasks, getCrops, createTask, assignTaskToCrop, deleteTask, updateTaskStatus } from "../api/api";
+import {
+  getTasks,
+  getCrops,
+  createTask,
+  assignTaskToCrop,
+  deleteTask,
+  updateTask,
+  updateTaskCrop,
+  updateTaskStatus,
+} from "../api/api";
 
 const parseJwt = (token) => {
   try {
@@ -62,11 +71,18 @@ export default function Tasks({ token }) {
   const [showCreateForm, setShowCreateForm] = useState(!!cropIdFromUrl);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState(null);
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editError, setEditError] = useState(null);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const [taskName, setTaskName] = useState("");
   const [taskDesc, setTaskDesc] = useState("");
   const [taskStatus, setTaskStatus] = useState("pending");
   const [selectedCropId, setSelectedCropId] = useState(cropIdFromUrl || "");
+  const [editTaskName, setEditTaskName] = useState("");
+  const [editTaskDesc, setEditTaskDesc] = useState("");
+  const [editTaskStatus, setEditTaskStatus] = useState("pending");
+  const [editCropId, setEditCropId] = useState("");
 
   const currentUser = useMemo(() => parseJwt(token), [token]);
 
@@ -115,6 +131,52 @@ export default function Tasks({ token }) {
       setTasks(Array.isArray(updatedTasks) ? updatedTasks : []);
     } catch (err) {
       setError(err.message || "Error al eliminar tarea");
+    }
+  };
+
+  const beginEditTask = (task) => {
+    setEditingTaskId(task.id);
+    setEditTaskName(task.name || "");
+    setEditTaskDesc(task.description || "");
+    setEditTaskStatus(normalizeStatus(task.status) === "unknown" ? "pending" : normalizeStatus(task.status));
+    setEditCropId(task.crop_id ? String(task.crop_id) : "");
+    setEditError(null);
+  };
+
+  const cancelEditTask = () => {
+    setEditingTaskId(null);
+    setEditTaskName("");
+    setEditTaskDesc("");
+    setEditTaskStatus("pending");
+    setEditCropId("");
+    setEditError(null);
+  };
+
+  const handleSaveTask = async (task) => {
+    if (!editTaskName.trim() || !editTaskDesc.trim() || !editCropId) {
+      setEditError("Nombre, descripción y cultivo son obligatorios");
+      return;
+    }
+
+    setSavingEdit(true);
+    setEditError(null);
+
+    try {
+      await updateTask(token, task.id, {
+        user_id: task.user_id,
+        name: editTaskName.trim(),
+        description: editTaskDesc.trim(),
+        status: editTaskStatus,
+      });
+      await updateTaskCrop(token, task.id, editCropId);
+
+      const updatedTasks = await getTasks(token);
+      setTasks(Array.isArray(updatedTasks) ? updatedTasks : []);
+      cancelEditTask();
+    } catch (err) {
+      setEditError(err.message || "Error al actualizar tarea");
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -289,7 +351,7 @@ export default function Tasks({ token }) {
               ...(statusFilter === "all" ? activeFilterButton : {}),
             }}
           >
-            📊 Todas
+            Todas
           </button>
           {availableStatuses.map((status) => (
             <button
@@ -312,7 +374,7 @@ export default function Tasks({ token }) {
               backgroundColor: showCreateForm ? "#EF4444" : "#10B981",
             }}
           >
-            {showCreateForm ? "❌ Cancelar" : "➕ Nueva Tarea"}
+            {showCreateForm ? "Cancelar" : "Nueva Tarea"}
           </button>
         </div>
 
@@ -326,6 +388,7 @@ export default function Tasks({ token }) {
             {filteredTasks.map((task) => {
               const taskCrop = crops.find((c) => c.id === task.crop_id);
               const meta = getStatusMeta(task.status);
+              const isEditing = editingTaskId === task.id;
               return (
                 <article key={task.id} style={card}>
                   <div style={cardHeader}>
@@ -338,39 +401,97 @@ export default function Tasks({ token }) {
                     </div>
                   </div>
 
-                  <div style={cardBody}>
-                    <h3 style={taskTitle}>{task.name}</h3>
-                    <p style={taskDescription}>{task.description}</p>
-                  </div>
-
-                  <div style={cardFooter}>
-                    <div style={metaBlock}>
-                      <span style={metaLabel}>Cultivo</span>
-                      <span style={metaValue}>{taskCrop?.name || "No asignado"}</span>
+                  {isEditing ? (
+                    <div style={editPanel}>
+                      {editError && <div style={errorBanner}>{editError}</div>}
+                      <input
+                        type="text"
+                        value={editTaskName}
+                        onChange={(e) => setEditTaskName(e.target.value)}
+                        style={formInput}
+                        placeholder="Nombre de la tarea"
+                      />
+                      <textarea
+                        value={editTaskDesc}
+                        onChange={(e) => setEditTaskDesc(e.target.value)}
+                        style={{ ...formInput, minHeight: "110px", resize: "vertical" }}
+                        placeholder="Descripción de la tarea"
+                      />
+                      <div style={formGrid}>
+                        <select value={editCropId} onChange={(e) => setEditCropId(e.target.value)} style={formInput}>
+                          <option value="">Selecciona un cultivo</option>
+                          {crops.map((crop) => (
+                            <option key={crop.id} value={crop.id}>
+                              {crop.name}
+                            </option>
+                          ))}
+                        </select>
+                        <select value={editTaskStatus} onChange={(e) => setEditTaskStatus(e.target.value)} style={formInput}>
+                          <option value="pending">Pendiente</option>
+                          <option value="in_progress">En Progreso</option>
+                          <option value="completed">Completada</option>
+                        </select>
+                      </div>
+                      <div style={actionButtonsContainer}>
+                        <button
+                          onClick={() => handleSaveTask(task)}
+                          disabled={savingEdit}
+                          style={{ ...actionButton, backgroundColor: "#2F8F4C" }}
+                        >
+                          {savingEdit ? "Guardando..." : "Guardar"}
+                        </button>
+                        <button
+                          onClick={cancelEditTask}
+                          disabled={savingEdit}
+                          style={{ ...actionButton, backgroundColor: "#64748B" }}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
                     </div>
-                    <div style={metaBlock}>
-                      <span style={metaLabel}>Estado</span>
-                      <span style={metaValue}>{meta.label}</span>
-                    </div>
-                  </div>
+                  ) : (
+                    <>
+                      <div style={cardBody}>
+                        <h3 style={taskTitle}>{task.name}</h3>
+                        <p style={taskDescription}>{task.description}</p>
+                      </div>
 
-                  <div style={actionButtonsContainer}>
-                    <button
-                      onClick={() => handleToggleStatus(task)}
-                      style={{
-                        ...actionButton,
-                        backgroundColor: task.status === "completed" ? "#FFA500" : "#22C55E",
-                      }}
-                    >
-                      {task.status === "completed" ? "↩️ Deshacer" : "✓ Completar"}
-                    </button>
-                    <button
-                      onClick={() => handleDeleteTask(task.id)}
-                      style={{ ...actionButton, backgroundColor: "#EF4444" }}
-                    >
-                      🗑️ Eliminar
-                    </button>
-                  </div>
+                      <div style={cardFooter}>
+                        <div style={metaBlock}>
+                          <span style={metaLabel}>Cultivo</span>
+                          <span style={metaValue}>{taskCrop?.name || "No asignado"}</span>
+                        </div>
+                        <div style={metaBlock}>
+                          <span style={metaLabel}>Estado</span>
+                          <span style={metaValue}>{meta.label}</span>
+                        </div>
+                      </div>
+
+                      <div style={actionButtonsContainer}>
+                        <button
+                          onClick={() => beginEditTask(task)}
+                          style={{ ...actionButton, backgroundColor: "#2563EB" }}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleToggleStatus(task)}
+                          style={{
+                            ...actionButton,
+                            backgroundColor: task.status === "completed" ? "#FFA500" : "#22C55E",
+                          }}
+                        >
+                          {task.status === "completed" ? "Deshacer" : "Completar"}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteTask(task.id)}
+                          style={{ ...actionButton, backgroundColor: "#EF4444" }}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </article>
               );
             })}
@@ -687,6 +808,11 @@ const errorBanner = {
   borderRadius: "8px",
   marginBottom: "1rem",
   fontSize: "0.9rem",
+};
+
+const editPanel = {
+  display: "grid",
+  gap: "14px",
 };
 
 const actionButtonsContainer = {

@@ -315,6 +315,16 @@ h3 {
   font-weight: 700;
 }
 
+.compact-info {
+  margin-top: 14px;
+}
+
+.calendar-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .admin-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -425,7 +435,8 @@ h3 {
 
   .metric-grid,
   .card-grid,
-  .detail-grid {
+  .detail-grid,
+  .calendar-form-grid {
     grid-template-columns: 1fr;
   }
 

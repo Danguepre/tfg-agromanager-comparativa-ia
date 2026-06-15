@@ -39,22 +39,22 @@ export default function Home() {
         <h2 style={sectionTitle}>Todo lo que necesitas para gestionar tu producción</h2>
         <div style={featureGrid}>
           <article className="home-feature-card" style={featureCard}>
-            <div className="home-icon-circle" style={iconCircle}>🌿</div>
+            <div className="home-icon-circle" style={iconCircle}>01</div>
             <h3 style={featureTitle}>Control de cultivos</h3>
             <p style={featureDescription}>Monitorea cada cultivo, ciclo y actividad con alertas claras.</p>
           </article>
           <article className="home-feature-card" style={featureCard}>
-            <div className="home-icon-circle" style={iconCircle}>📅</div>
+            <div className="home-icon-circle" style={iconCircle}>02</div>
             <h3 style={featureTitle}>Calendario inteligente</h3>
             <p style={featureDescription}>Planifica tareas, siembras y riegos desde un espacio centralizado.</p>
           </article>
           <article className="home-feature-card" style={featureCard}>
-            <div className="home-icon-circle" style={iconCircle}>💧</div>
+            <div className="home-icon-circle" style={iconCircle}>03</div>
             <h3 style={featureTitle}>Riego eficiente</h3>
             <p style={featureDescription}>Gestiona el agua de forma óptima para mejorar rendimiento y ahorro.</p>
           </article>
           <article className="home-feature-card" style={featureCard}>
-            <div className="home-icon-circle" style={iconCircle}>📈</div>
+            <div className="home-icon-circle" style={iconCircle}>04</div>
             <h3 style={featureTitle}>Informe rápido</h3>
             <p style={featureDescription}>Obtén datos clave de rendimiento en un diseño sencillo y moderno.</p>
           </article>

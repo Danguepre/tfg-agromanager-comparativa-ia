@@ -109,11 +109,6 @@ export default function PublishedCrops({ token }) {
             Anade cualquier cultivo existente a tu espacio personal como una copia independiente.
           </p>
         </div>
-        <div style={headerActions}>
-          <button style={secondaryButton} onClick={loadPublishedCrops}>
-            Actualizar
-          </button>
-        </div>
       </header>
 
       {message && <p style={statusSuccess}>{message}</p>}
@@ -268,12 +263,6 @@ const headerStyle = {
   alignItems: "center",
   gap: "16px",
   marginBottom: "28px",
-};
-
-const headerActions = {
-  display: "flex",
-  gap: "12px",
-  alignItems: "center",
 };
 
 const titleStyle = {

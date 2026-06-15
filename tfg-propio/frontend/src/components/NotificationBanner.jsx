@@ -37,7 +37,7 @@ const NotificationBanner = ({ events }) => {
         fontFamily: 'Arial, sans-serif',
       }}
     >
-      <span style={{ fontSize: '20px', marginRight: '8px' }}>⚠️</span>
+      <span style={{ fontSize: '20px', marginRight: '8px' }}>!</span>
       <div>
         <strong>Tienes {currentTasks.length} tarea{currentTasks.length > 1 ? 's' : ''} en esta quincena:</strong> {taskTitles}
       </div>

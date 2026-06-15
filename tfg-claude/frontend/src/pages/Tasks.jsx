@@ -100,7 +100,7 @@ export function Tasks() {
 
           <div className="form-group">
             <textarea
-              placeholder="Descripción (opcional)"
+              placeholder="Descripción"
               value={newTaskDescription}
               onChange={(e) => setNewTaskDescription(e.target.value)}
               rows="2"

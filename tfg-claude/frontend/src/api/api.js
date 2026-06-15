@@ -284,7 +284,7 @@ export function addCropToMyCrops(cropId, token) {
  * Obtiene calendarios del usuario.
  */
 export async function getCalendars(token) {
-  const response = await apiGet('/calendar/', { token })
+  const response = await apiGet('/calendar', { token })
   return normalizeListResponse(response)
 }
 
@@ -298,9 +298,15 @@ export async function getCalendarEvents(token) {
 
 /**
  * Crea un nuevo calendario.
+ * El crop_id debe ir como query parameter, no en el body.
+ * El body contiene solo las fechas opcionales.
  */
 export function createCalendar(data, token) {
-  return apiPost('/calendar/', data, { token })
+  if (!data.crop_id) {
+    throw new Error('crop_id es requerido')
+  }
+  const { crop_id, ...bodyData } = data
+  return apiPost(`/calendar?crop_id=${crop_id}`, bodyData, { token })
 }
 
 /**
@@ -315,6 +321,48 @@ export function getCalendarDetails(calendarId, token) {
  */
 export function updateCalendar(calendarId, data, token) {
   return apiPut(`/calendar/${calendarId}`, data, { token })
+}
+
+/**
+ * Obtiene el calendario de un cultivo específico.
+ */
+export function getCalendarForCrop(cropId, token) {
+  return apiGet(`/calendar/crop/${cropId}`, { token })
+}
+
+/**
+ * Actualiza el calendario de un cultivo.
+ */
+export function updateCalendarForCrop(cropId, data, token) {
+  return apiPut(`/calendar/crop/${cropId}`, data, { token })
+}
+
+/**
+ * Elimina un calendario.
+ */
+export function deleteCalendar(calendarId, token) {
+  return apiDelete(`/calendar/${calendarId}`, { token })
+}
+
+/**
+ * Activa un calendario.
+ */
+export function activateCalendar(calendarId, token) {
+  return apiPost(`/calendar/${calendarId}/activate`, {}, { token })
+}
+
+/**
+ * Avanza a la siguiente fase de un calendario.
+ */
+export function advancePhase(calendarId, token) {
+  return apiPost(`/calendar/${calendarId}/advance`, {}, { token })
+}
+
+/**
+ * Obtiene eventos de un calendario específico.
+ */
+export function getCalendarEventsForCalendar(calendarId, token) {
+  return apiGet(`/calendar/${calendarId}/events`, { token })
 }
 
 // ============ TASKS ENDPOINTS ============

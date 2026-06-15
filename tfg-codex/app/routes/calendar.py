@@ -71,6 +71,8 @@ def _apply_calendar_update(calendar: PlantingCalendar, payload: PlantingCalendar
             continue
         setattr(calendar, field, value)
 
+    if calendar.current_phase_index is None:
+        calendar.current_phase_index = 0
     if calendar.current_phase_index < 0 or calendar.current_phase_index > 2:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid phase index")
     if calendar.is_active and not _calendar_is_complete(calendar):

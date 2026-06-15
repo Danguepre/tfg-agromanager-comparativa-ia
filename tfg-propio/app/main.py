@@ -92,4 +92,4 @@ app.include_router(dashboard.router)
 
 @app.get("/")
 def root():
-    return {"message": "API funcionando con PostgreSQL 🚀"}
+    return {"message": "API funcionando con PostgreSQL"}
