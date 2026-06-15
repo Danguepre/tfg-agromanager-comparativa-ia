@@ -37,7 +37,7 @@ export default function Login({ onSwitch, onLogin }) {
       onLogin(data.access_token);
       navigate("/dashboard", { replace: true });
     } catch {
-      setError("❌ Email o contraseña incorrectos");
+      setError("Email o contraseña incorrectos");
     } finally {
       setLoading(false);
     }
@@ -54,7 +54,6 @@ export default function Login({ onSwitch, onLogin }) {
               Accede rápidamente a tu panel de cultivos, calendario y tareas.
             </p>
           </div>
-          <div style={heroAccent}>🌿</div>
         </div>
 
         <form onSubmit={handleLogin} style={form}>
@@ -123,10 +122,6 @@ const hero = {
   justifyContent: "space-between",
   gap: "16px",
   marginBottom: "28px",
-};
-
-const heroAccent = {
-  fontSize: "2.6rem",
 };
 
 const badge = {

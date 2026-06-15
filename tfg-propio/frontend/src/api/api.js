@@ -99,6 +99,21 @@ export const updateCrop = async (token, cropId, cropData) => {
   return handleResponse(res, "Error al actualizar cultivo");
 };
 
+export const updateCropImage = async (token, cropId, imageData) => {
+  if (!(imageData instanceof FormData)) {
+    throw new Error("updateCropImage expects FormData");
+  }
+
+  const res = await fetch(`${API_URL}/crops/${cropId}/image`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: imageData,
+  });
+  return handleResponse(res, "Error al actualizar imagen del cultivo");
+};
+
 export const deleteCrop = async (token, cropId) => {
   const res = await fetch(`${API_URL}/crops/${cropId}`, {
     method: "DELETE",
@@ -283,6 +298,30 @@ export const assignTaskToCrop = async (token, taskId, cropId) => {
     body: JSON.stringify({ task_id: taskId, crop_id: cropId }),
   });
   return handleResponse(res, "Error al asignar tarea al cultivo");
+};
+
+export const updateTask = async (token, taskId, taskData) => {
+  const res = await fetch(`${API_URL}/tasks/${taskId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(taskData),
+  });
+  return handleResponse(res, "Error al actualizar tarea");
+};
+
+export const updateTaskCrop = async (token, taskId, cropId) => {
+  const res = await fetch(`${API_URL}/tasks/${taskId}/crop`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ task_id: taskId, crop_id: cropId }),
+  });
+  return handleResponse(res, "Error al actualizar cultivo de la tarea");
 };
 
 export const deleteTask = async (token, taskId) => {

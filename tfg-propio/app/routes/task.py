@@ -62,6 +62,36 @@ def assign_task_to_crop(
     return {"message": "Task assigned to crop"}
 
 
+@router.put("/{task_id}/crop")
+def update_task_crop(
+    task_id: int,
+    data: TaskCropCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    if data.task_id != task_id:
+        raise HTTPException(status_code=400, detail="Task id does not match")
+
+    task = db.query(Task).filter(Task.id == task_id).first()
+    crop = db.query(Crop).filter(Crop.id == data.crop_id).first()
+
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    if not crop:
+        raise HTTPException(status_code=404, detail="Crop not found")
+
+    if current_user["role"] != "admin" and task.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="Not authorized to update this task")
+    if current_user["role"] != "admin" and crop.user_id != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="Not authorized to assign this crop")
+
+    db.query(TaskCrop).filter(TaskCrop.task_id == task_id).delete(synchronize_session=False)
+    db.add(TaskCrop(task_id=task_id, crop_id=data.crop_id))
+    db.commit()
+
+    return {"message": "Task crop updated"}
+
+
 @router.get("/", response_model=list[TaskResponse])
 def get_tasks(
     db: Session = Depends(get_db),

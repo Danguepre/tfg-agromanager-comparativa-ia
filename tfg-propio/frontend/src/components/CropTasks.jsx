@@ -62,7 +62,7 @@ export default function CropTasks({ cropId, userId, token }) {
       setTaskDesc("");
       setTaskStatus("pending");
       setShowForm(false);
-      setSuccess("✅ Tarea creada exitosamente");
+      setSuccess("Tarea creada exitosamente");
     } catch (err) {
       setError(err.message || "Error al crear tarea");
     } finally {
@@ -75,7 +75,7 @@ export default function CropTasks({ cropId, userId, token }) {
 
     try {
       await deleteTask(token, taskId);
-      setSuccess("✅ Tarea eliminada exitosamente");
+      setSuccess("Tarea eliminada exitosamente");
       await loadTasks();
     } catch (err) {
       setError(err.message || "Error al eliminar tarea");
@@ -100,12 +100,12 @@ export default function CropTasks({ cropId, userId, token }) {
   return (
     <section style={containerStyle}>
       <div style={headerStyle}>
-        <h3 style={titleStyle}>📋 Tareas del Cultivo</h3>
+        <h3 style={titleStyle}>Tareas del Cultivo</h3>
         <button
           onClick={() => setShowForm(!showForm)}
           style={buttonStyle}
         >
-          {showForm ? "❌ Cancelar" : "➕ Nueva Tarea"}
+          {showForm ? "Cancelar" : "Nueva Tarea"}
         </button>
       </div>
 
@@ -179,13 +179,13 @@ export default function CropTasks({ cropId, userId, token }) {
                     backgroundColor: task.status === "completed" ? "#FFA500" : "#22C55E",
                   }}
                 >
-                  {task.status === "completed" ? "↩️ Deshacer" : "✓ Completar"}
+                  {task.status === "completed" ? "Deshacer" : "Completar"}
                 </button>
                 <button
                   onClick={() => handleDeleteTask(task.id)}
                   style={{ ...actionButtonStyle, backgroundColor: "#EF4444" }}
                 >
-                  🗑️ Eliminar
+                  Eliminar
                 </button>
               </div>
             </div>

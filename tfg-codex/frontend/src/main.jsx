@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import {
   apiRequest,
   clearSession,
+  deleteMyCrop,
   deleteAdminCrop,
   deleteAdminTask,
   deleteAdminUser,
@@ -19,6 +20,7 @@ import {
   normalizeList,
   registerRequest,
   saveSession,
+  updateMyCrop,
   updateAdminCrop,
   updateAdminTask,
   updateAdminUser,
@@ -447,18 +449,108 @@ function CropCard({ crop, action }) {
 }
 
 function MyCropsPage() {
-  const { data, loading, error } = useApiData(() => apiRequest("/crops/my"), []);
+  const [refresh, setRefresh] = useState(0);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ name: "", description: "", crop_type: "" });
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const { data, loading, error, setError } = useApiData(() => apiRequest("/crops/my"), [refresh]);
   const crops = normalizeList(data);
+
+  function startEdit(crop) {
+    setMessage("");
+    setError("");
+    setEditing(crop);
+    setForm({
+      name: crop.name || "",
+      description: crop.description || "",
+      crop_type: crop.crop_type || "",
+    });
+  }
+
+  async function saveCrop(event) {
+    event.preventDefault();
+    if (!editing) return;
+    setSaving(true);
+    setMessage("");
+    setError("");
+    try {
+      await updateMyCrop(editing.id, form);
+      setEditing(null);
+      setMessage("Cultivo actualizado correctamente.");
+      setRefresh((value) => value + 1);
+    } catch (err) {
+      setError(err.message || "No se pudo actualizar el cultivo");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function removeCrop(crop) {
+    if (!window.confirm(`Eliminar cultivo #${crop.id}?`)) return;
+    setMessage("");
+    setError("");
+    try {
+      await deleteMyCrop(crop.id);
+      if (editing?.id === crop.id) setEditing(null);
+      setMessage("Cultivo eliminado correctamente.");
+      setRefresh((value) => value + 1);
+    } catch (err) {
+      setError(err.message || "No se pudo eliminar el cultivo");
+    }
+  }
+
   return (
     <>
       <PageHeader title="Mis cultivos" description="Cultivos asociados a tu cuenta." />
+      {message && <p className="state">{message}</p>}
       <StateBlock loading={loading} error={error} empty={crops.length === 0}>
         <section className="card-grid">
           {crops.map((crop) => (
-            <CropCard crop={crop} key={crop.id} />
+            <CropCard
+              crop={crop}
+              key={crop.id}
+              action={
+                <>
+                  <button type="button" onClick={() => startEdit(crop)}>
+                    Editar
+                  </button>
+                  <button type="button" className="danger" onClick={() => removeCrop(crop)}>
+                    Eliminar
+                  </button>
+                </>
+              }
+            />
           ))}
         </section>
       </StateBlock>
+      {editing && (
+        <section className="section admin-editor">
+          <h2>Editar cultivo #{editing.id}</h2>
+          <form className="form admin-form" onSubmit={saveCrop}>
+            <label>
+              Nombre
+              <input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required />
+            </label>
+            <label>
+              Descripcion
+              <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} rows="4" />
+            </label>
+            <label>
+              Tipo
+              <input value={form.crop_type} onChange={(event) => setForm((current) => ({ ...current, crop_type: event.target.value }))} />
+            </label>
+            <div className="button-row">
+              <button className="primary-button" type="submit" disabled={saving}>
+                {saving ? "Guardando..." : "Guardar cambios"}
+              </button>
+              <button type="button" onClick={() => setEditing(null)}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
     </>
   );
 }
@@ -545,24 +637,129 @@ function InfoBox({ title, rows }) {
 }
 
 function CalendarPage() {
-  const { data, loading, error } = useApiData(async () => {
-    const [calendars, events] = await Promise.all([apiRequest("/calendar/"), apiRequest("/calendar/events")]);
-    return { calendars: normalizeList(calendars), events: normalizeList(events) };
-  }, []);
+  const emptyCalendarForm = {
+    crop_id: "",
+    planting_start: "",
+    planting_end: "",
+    transplant_start: "",
+    transplant_end: "",
+    harvest_start: "",
+    harvest_end: "",
+  };
+  const [refresh, setRefresh] = useState(0);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState(emptyCalendarForm);
+  const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+  const { data, loading, error, setError } = useApiData(async () => {
+    const [calendars, events, crops] = await Promise.all([
+      apiRequest("/calendar/"),
+      apiRequest("/calendar/events"),
+      apiRequest("/crops/my"),
+    ]);
+    return {
+      calendars: normalizeList(calendars),
+      events: normalizeList(events),
+      crops: normalizeList(crops),
+    };
+  }, [refresh]);
+
+  const calendars = data?.calendars || [];
+  const events = data?.events || [];
+  const crops = data?.crops || [];
+  const cropById = new Map(crops.map((crop) => [crop.id, crop]));
+  const cropsWithoutCalendar = crops.filter((crop) => !calendars.some((calendar) => calendar.crop_id === crop.id));
+
+  function updateCalendarForm(field, value) {
+    setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function startCreate() {
+    setMessage("");
+    setError("");
+    setEditing(null);
+    setForm({ ...emptyCalendarForm, crop_id: cropsWithoutCalendar[0]?.id || crops[0]?.id || "" });
+  }
+
+  function startEdit(calendar) {
+    setMessage("");
+    setError("");
+    setEditing(calendar);
+    setForm(calendarToForm(calendar));
+  }
+
+  async function saveCalendar(event) {
+    event.preventDefault();
+    setSaving(true);
+    setMessage("");
+    setError("");
+    try {
+      const payload = calendarPayload(form);
+      if (editing) {
+        await apiRequest(`/calendar/${editing.id}`, { method: "PUT", body: payload });
+        setMessage("Calendario actualizado correctamente.");
+      } else {
+        await apiRequest("/calendar/", { method: "POST", body: { ...payload, crop_id: Number(form.crop_id), current_phase_index: 0 } });
+        setMessage("Calendario creado correctamente.");
+      }
+      setEditing(null);
+      setForm(emptyCalendarForm);
+      setRefresh((value) => value + 1);
+    } catch (err) {
+      setError(err.message || "No se pudo guardar el calendario");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function runCalendarAction(calendar, action, successMessage) {
+    setMessage("");
+    setError("");
+    try {
+      await action();
+      setMessage(successMessage);
+      setRefresh((value) => value + 1);
+    } catch (err) {
+      setError(err.message || "No se pudo actualizar el calendario");
+    }
+  }
+
+  function deleteCalendar(calendar) {
+    if (!window.confirm(`Eliminar calendario #${calendar.id}?`)) return;
+    runCalendarAction(
+      calendar,
+      () => apiRequest(`/calendar/${calendar.id}`, { method: "DELETE" }),
+      "Calendario eliminado correctamente.",
+    );
+  }
 
   return (
     <>
-      <PageHeader title="Calendario" description="Calendarios y fases activas de tus cultivos." />
-      <StateBlock loading={loading} error={error} empty={!data || data.calendars.length === 0}>
+      <PageHeader
+        title="Calendario"
+        description="Calendarios y fases activas de tus cultivos."
+        action={<button type="button" onClick={startCreate} disabled={loading || cropsWithoutCalendar.length === 0}>Crear calendario</button>}
+      />
+      {message && <p className="state">{message}</p>}
+      {loading && <p className="state">Cargando...</p>}
+      {error && <p className="alert">{error}</p>}
+      {!loading && !error && (
+        <>
+          {crops.length === 0 && <p className="state">Primero anade un cultivo propio para crear su calendario agricola.</p>}
+          {calendars.length === 0 && crops.length > 0 && (
+            <p className="state">Todavia no hay calendarios. Crea uno para asociar fechas de siembra, trasplante y cosecha a tus cultivos.</p>
+          )}
         <section className="section">
-          <h2>Eventos activos</h2>
-          {data?.events.length ? (
+          <h2>Proximos eventos activos</h2>
+          {events.length ? (
             <div className="list">
-              {data.events.map((event) => (
+              {events.map((event) => (
                 <article className="list-item" key={`${event.calendar_id}-${event.phase_index}`}>
                   <strong>{event.crop_name}</strong>
                   <span>{event.phase}</span>
-                  <small>Mes {event.start_month} a mes {event.end_month}</small>
+                  <small>
+                    Mes {event.start_month}, quincena {event.start_fortnight} a mes {event.end_month}, quincena {event.end_fortnight}
+                  </small>
                 </article>
               ))}
             </div>
@@ -571,18 +768,133 @@ function CalendarPage() {
           )}
         </section>
         <section className="card-grid">
-          {data?.calendars.map((calendar) => (
-            <article className="item-card" key={calendar.id}>
-              <h3>Calendario #{calendar.id}</h3>
-              <p>Cultivo #{calendar.crop_id}</p>
-              <span className={`badge ${calendar.is_active ? "success" : ""}`}>{calendar.status}</span>
-              <small>Fase actual: {calendar.current_phase_index}</small>
-            </article>
+          {calendars.map((calendar) => (
+            <CalendarCard
+              key={calendar.id}
+              calendar={calendar}
+              crop={cropById.get(calendar.crop_id)}
+              onEdit={startEdit}
+              onActivate={(item) => runCalendarAction(item, () => apiRequest(`/calendar/crop/${item.crop_id}/activate`, { method: "POST" }), "Calendario activado correctamente.")}
+              onAdvance={(item) => runCalendarAction(item, () => apiRequest(`/calendar/crop/${item.crop_id}/advance`, { method: "POST" }), item.current_phase_index >= 2 ? "Calendario completado correctamente." : "Calendario avanzado a la siguiente fase.")}
+              onDelete={deleteCalendar}
+            />
           ))}
         </section>
-      </StateBlock>
+        </>
+      )}
+      {(form.crop_id || editing) && (
+        <section className="section admin-editor">
+          <h2>{editing ? `Editar calendario #${editing.id}` : "Crear calendario"}</h2>
+          <form className="form admin-form" onSubmit={saveCalendar}>
+            {!editing && (
+              <label>
+                Cultivo
+                <select value={form.crop_id} onChange={(event) => updateCalendarForm("crop_id", event.target.value)} required>
+                  {(cropsWithoutCalendar.length ? cropsWithoutCalendar : crops).map((crop) => (
+                    <option key={crop.id} value={crop.id}>
+                      {crop.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <div className="calendar-form-grid">
+              <CalendarDateField label="Siembra inicio" name="planting_start" value={form.planting_start} onChange={updateCalendarForm} />
+              <CalendarDateField label="Siembra fin" name="planting_end" value={form.planting_end} onChange={updateCalendarForm} />
+              <CalendarDateField label="Trasplante inicio" name="transplant_start" value={form.transplant_start} onChange={updateCalendarForm} />
+              <CalendarDateField label="Trasplante fin" name="transplant_end" value={form.transplant_end} onChange={updateCalendarForm} />
+              <CalendarDateField label="Cosecha inicio" name="harvest_start" value={form.harvest_start} onChange={updateCalendarForm} />
+              <CalendarDateField label="Cosecha fin" name="harvest_end" value={form.harvest_end} onChange={updateCalendarForm} />
+            </div>
+            <div className="button-row">
+              <button className="primary-button" type="submit" disabled={saving}>
+                {saving ? "Guardando..." : "Guardar calendario"}
+              </button>
+              <button type="button" onClick={() => { setEditing(null); setForm(emptyCalendarForm); }}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
     </>
   );
+}
+
+function CalendarCard({ calendar, crop, onEdit, onActivate, onAdvance, onDelete }) {
+  const phaseName = calendar.status === "completed" ? "Completado" : calendarPhaseName(calendar.current_phase_index);
+  return (
+    <article className="item-card">
+      <div>
+        <h3>{crop?.name || `Cultivo #${calendar.crop_id}`}</h3>
+        <p>Calendario #{calendar.id}</p>
+      </div>
+      <span className={`badge ${calendar.is_active ? "success" : ""}`}>{calendar.status}</span>
+      <dl className="info-list compact-info">
+        {[
+          ["Fase actual", phaseName],
+          ["Siembra", formatDateRange(calendar.planting_start, calendar.planting_end)],
+          ["Trasplante", formatDateRange(calendar.transplant_start, calendar.transplant_end)],
+          ["Cosecha", formatDateRange(calendar.harvest_start, calendar.harvest_end)],
+        ].map(([label, value]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <div className="button-row">
+        <button type="button" onClick={() => onEdit(calendar)}>Editar fechas</button>
+        {!calendar.is_active && calendar.status !== "completed" && (
+          <button type="button" onClick={() => onActivate(calendar)}>Activar</button>
+        )}
+        {calendar.is_active && calendar.status !== "completed" && (
+          <button type="button" onClick={() => onAdvance(calendar)}>
+            {calendar.current_phase_index >= 2 ? "Completar" : "Avanzar fase"}
+          </button>
+        )}
+        <button type="button" className="danger" onClick={() => onDelete(calendar)}>Eliminar</button>
+      </div>
+    </article>
+  );
+}
+
+function CalendarDateField({ label, name, value, onChange }) {
+  return (
+    <label>
+      {label}
+      <input type="date" value={value || ""} onChange={(event) => onChange(name, event.target.value)} />
+    </label>
+  );
+}
+
+function calendarToForm(calendar) {
+  return {
+    crop_id: calendar.crop_id,
+    planting_start: calendar.planting_start || "",
+    planting_end: calendar.planting_end || "",
+    transplant_start: calendar.transplant_start || "",
+    transplant_end: calendar.transplant_end || "",
+    harvest_start: calendar.harvest_start || "",
+    harvest_end: calendar.harvest_end || "",
+  };
+}
+
+function calendarPayload(form) {
+  return ["planting_start", "planting_end", "transplant_start", "transplant_end", "harvest_start", "harvest_end"].reduce((payload, field) => {
+    payload[field] = form[field] || null;
+    return payload;
+  }, {});
+}
+
+function calendarPhaseName(index) {
+  return ["Siembra", "Trasplante", "Cosecha"][index] || `Fase ${index}`;
+}
+
+function formatDateRange(start, end) {
+  if (!start && !end) return "No definido";
+  if (start && end) return `${start} - ${end}`;
+  return start || end;
 }
 
 function TasksPage() {
@@ -732,16 +1044,13 @@ function AdminUsersPage() {
       columns={[
         ["ID", (user) => user.id],
         ["Email", (user) => user.email],
-        ["Nombre", (user) => user.username || user.name],
+        ["Nombre", (user) => user.username],
         ["Rol", (user) => user.role || "user"],
-        ["Activo", (user) => (Object.prototype.hasOwnProperty.call(user, "is_active") ? (user.is_active ? "Si" : "No") : "No disponible")],
       ]}
       fields={[
         { name: "email", label: "Email", type: "email" },
         { name: "username", label: "Nombre de usuario" },
-        { name: "name", label: "Nombre" },
         { name: "role", label: "Rol", type: "select", options: ["user", "admin"] },
-        { name: "is_active", label: "Activo", type: "checkbox" },
       ]}
     />
   );
@@ -850,7 +1159,7 @@ function AdminManagePage({ title, description, loader, detailLoader, updater, de
   }
 
   async function removeItem(item) {
-    if (!window.confirm(`¿Eliminar ${entityName} #${item.id}?`)) return;
+    if (!window.confirm(`Eliminar ${entityName} #${item.id}?`)) return;
     setMessage("");
     setError("");
     try {

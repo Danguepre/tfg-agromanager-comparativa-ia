@@ -90,14 +90,9 @@ export default function Calendar() {
             Visualiza cada mes con su primera y segunda quincena, mostrando los eventos de siembra, trasplante y cosecha.
           </p>
 
-          <div style={form}>
-            <button type="button" style={loadButton} disabled={loading} onClick={loadEvents}>
-              {loading ? "Cargando..." : "Cargar eventos"}
-            </button>
-          </div>
-
           {error && <p style={errorText}>{error}</p>}
           {message && <p style={successText}>{message}</p>}
+          {loading && <p style={loadingText}>Cargando calendario...</p>}
         </div>
       </section>
 
@@ -235,14 +230,6 @@ const description = {
   color: "#4F645C",
 };
 
-const form = {
-  marginTop: "28px",
-  display: "flex",
-  flexWrap: "wrap",
-  alignItems: "flex-end",
-  gap: "16px",
-};
-
 const phaseBadge = (phase) => {
   const colors = {
     Siembra: { background: "#E8F6EA", color: "#2E7D32" },
@@ -260,23 +247,16 @@ const phaseBadge = (phase) => {
   };
 };
 
-const loadButton = {
-  padding: "14px 24px",
-  borderRadius: "14px",
-  border: "none",
-  background: "#4CAF50",
-  color: "white",
-  fontSize: "1rem",
-  fontWeight: 700,
-  cursor: "pointer",
-  transition: "transform 180ms ease, box-shadow 180ms ease",
-  boxShadow: "0 14px 24px rgba(76, 175, 80, 0.18)",
-};
-
 const errorText = {
   marginTop: "18px",
   color: "#9B2C2C",
   fontWeight: 600,
+};
+
+const loadingText = {
+  marginTop: "18px",
+  color: "#4F645C",
+  fontWeight: 700,
 };
 
 const successText = {

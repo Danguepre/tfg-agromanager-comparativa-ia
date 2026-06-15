@@ -33,7 +33,7 @@ export default function SignUp({ onSwitch, onLogin }) {
       onLogin(data.access_token);
 
     } catch {
-      setError("❌ Error al registrar o login automático");
+      setError("Error al registrar o login automático");
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ export default function SignUp({ onSwitch, onLogin }) {
 
   return (
     <div style={container}>
-      <h2>🌿 Crear cuenta</h2>
+      <h2>Crear cuenta</h2>
 
       <input name="name" placeholder="Nombre" onChange={handleChange} style={input}/>
       <input name="email" placeholder="Email" onChange={handleChange} style={input}/>

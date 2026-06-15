@@ -11,6 +11,7 @@ from app.database import get_db
 from app.dependencies import get_current_user, get_current_admin
 from app.models.user import User
 from app.models.crop import Crop
+from app.models.planting_calendar import PlantingCalendar
 from app.schemas.planting_calendar import (
     PlantingCalendarCreate,
     PlantingCalendarUpdate,
@@ -92,19 +93,18 @@ def list_user_calendars(
     """
     if current_user.role.value == "admin":
         # Admin ve todos los calendarios
-        query = db.query(db.query(db.execute(
-            db.select(db.func.count()).select_from(db.query.__class__)
-        )).scalar())
-        # Simplificar: usar get_user_calendars igualmente
-        calendars, total = get_user_calendars(db, current_user.id, skip, limit)
+        query = db.query(PlantingCalendar)
+        total = query.count()
+        calendars = query.offset(skip).limit(limit).all()
     else:
+        # Usuario normal ve solo sus calendarios
         calendars, total = get_user_calendars(db, current_user.id, skip, limit)
 
     return {
         "total": total,
         "skip": skip,
         "limit": limit,
-        "items": [PlantingCalendarResponse.from_attributes(c) for c in calendars],
+        "items": [PlantingCalendarResponse.model_validate(c) for c in calendars],
     }
 
 

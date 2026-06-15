@@ -95,6 +95,35 @@ class CalendarTestCase(unittest.TestCase):
         self.assertEqual(body["current_phase_index"], 0)
         self.assertEqual(body["status"], "draft")
 
+    def test_create_calendar_defaults_phase_index_when_omitted(self):
+        crop = create_crop(self.client, self.user_token, "Rucula").json()
+
+        response = self.client.post(
+            "/calendar/",
+            json={"crop_id": crop["id"], "planting_start": "2026-03-01"},
+            headers=auth_header(self.user_token),
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json()["current_phase_index"], 0)
+
+    def test_invalid_phase_index_returns_controlled_error(self):
+        crop = create_crop(self.client, self.user_token, "Rabano").json()
+        calendar = self.client.post(
+            "/calendar/",
+            json=complete_calendar_payload(crop["id"]),
+            headers=auth_header(self.user_token),
+        ).json()
+
+        response = self.client.put(
+            f"/calendar/{calendar['id']}",
+            json={"current_phase_index": 3},
+            headers=auth_header(self.user_token),
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["detail"], "Invalid phase index")
+
     def test_user_without_token_cannot_create_calendar(self):
         response = self.client.post("/calendar/", json={"crop_id": 1})
 

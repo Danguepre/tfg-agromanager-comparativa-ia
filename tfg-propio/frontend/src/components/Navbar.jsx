@@ -10,7 +10,6 @@ export default function Navbar() {
   return (
     <header style={navStyle}>
       <div style={brandStyle}>
-        <span style={brandIcon}>🌿</span>
         <h1 style={brandTitle}>AgroManager</h1>
       </div>
 
@@ -62,10 +61,6 @@ const brandStyle = {
   display: "flex",
   alignItems: "center",
   gap: "10px",
-};
-
-const brandIcon = {
-  fontSize: "1.4rem",
 };
 
 const brandTitle = {
